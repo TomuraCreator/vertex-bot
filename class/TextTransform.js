@@ -1,8 +1,8 @@
 module.exports = class TextTransform {
 
     static keys = require('../doc_models/translate_key');
-
-
+    static person_pattern = require('../doc_models/person');
+    static available = ["child", "is_ill", "is_vacation", "auto"];
 
     /**
      * 
@@ -28,31 +28,43 @@ module.exports = class TextTransform {
         substring = 'Подтвердите правильность введённых данных' 
         ) {
         
-        let str = `*${substring}* \n`
+        let str = `*${substring}* \n`;
 
-        if(substring === 'Вы искали:') {
+        // if(substring === 'Вы искали:') {
             for(let value in json ) {
                 if(TextTransform.keys.to_eng[value]) {
-                    str += `_${TextTransform.keys.to_eng[value]}_ : ${json[value]} \n`
+                    str += `_${TextTransform.keys.to_eng[value]}_ : ${(!TextTransform.available.includes(value)) ? json[value] : ''} \n`
+                    
+                    if(TextTransform.available.includes(value)) {
+                        let substring_available = '';
+                        for(let deep_value in json[value]) {
+                            if(deep_value === 'available') continue;
+
+                            substring_available += `_\t\t\t\t\t\t\t\t${
+                                TextTransform.keys.
+                                to_eng[deep_value]
+                            }_ : ${json[value][deep_value]} \n`
+                        }
+                        str += substring_available;
+                    }
                 } else {
+                    
                     if(json[value] === TextTransform.keys.to_eng) {
                         str += `_${TextTransform.keys.to_eng[value]}_ : ${
-                            (json[value] === null || json[value].available === false)
+                            (typeof json[value] == "Object"
+                            || json[value] === null)
                                 ? "нет" 
                                 : json[value]
                         } \n`
-                        if(json[value] in available) {
-                            let substring_available = '';
-                            for(let deep_value in json[value]) {
-                                substring_available += `_${TextTransform.keys.to_eng[json[value][deep_value]]}_ : ${json[value][deep_value]} \n`
-                            }
-                            str += substring_available;
-                        }
+                        
                     }
                 } 
-            }     
+            }
+                
         return str;
-        }
+        // } else {
+
+        // }
     }
 
     /**
@@ -80,5 +92,24 @@ module.exports = class TextTransform {
         })
 
         return replace_obj
+    }
+
+
+    static translateFieldstoEng( matches ) {
+        if(!matches) throw Error('not matches')
+        const configure_person = Object.assign({}, TextTransform.person_pattern);
+        const rus = TextTransform.keys.to_rus;
+        matches.forEach((substring) => {
+            if(substring.indexOf("-") !== -1) {
+                const arr_str = substring.trim().split('-');
+                if(TextTransform.available.includes(rus[arr_str[0]])) {
+                    configure_person[rus[arr_str[0]]][rus[arr_str[1]]] = arr_str[2];
+                } else {
+                    configure_person[rus[arr_str[0]]] = arr_str[1];
+                }
+
+            }
+        })
+        return configure_person;
     }
 }

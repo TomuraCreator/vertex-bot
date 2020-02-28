@@ -16,13 +16,13 @@ module.exports = {
         "больничный" : "is_ill",
         "отпуск": "is_vacation",
 
-        "Модель": "model",
-        "Номер": "state_car_number",
-        "Имена": "child_name",
-        "Начало": "date_ill_start",
-        "Конец": "date_ill_end",
-        "Дни": "days_vacation",
-        "Начало": "date_of_vacation"
+        "модель": "model",
+        "момер": "state_car_number",
+        "имена": "child_name",
+        "начало": "date_ill_start",
+        "конец": "date_ill_end",
+        "дни": "days_vacation",
+        "начало": "date_of_vacation"
 
     },
     "to_eng": {
@@ -41,13 +41,13 @@ module.exports = {
         "child" : "дети",
         "is_ill" : "больничный",
         "is_vacation": "отпуск",
-        "model": "Модель",
-        "state_car_number": "Номер",
-        "child_name": "Имена",
-        "date_ill_start": "Начало",
-        "date_ill_end": "Конец",
-        "days_vacation": "Дни",
-        "date_of_vacation": "Начало"
+        "model": "модель",
+        "state_car_number": "номер",
+        "child_name": "имена",
+        "date_ill_start": "начало",
+        "date_ill_end": "конец",
+        "days_vacation": "дни",
+        "date_of_vacation": "начало"
     }
 }
 

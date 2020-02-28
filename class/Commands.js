@@ -10,11 +10,24 @@ module.exports = class Commands {
      * @param {special mongo object} collection 
      */
     static add( matches, collection ) {
+      if(!matches) {
+        throw Error('matches is empty' );
+      } 
+      const person_generate = TextTransform.translateFieldstoEng(matches);
+      if(person_generate.surname 
+        && person_generate.shift 
+        && person_generate.position) {
+          return TextTransform.translateFieldstoRus(person_generate)
+        } else {
+          return false
+        }
+    }
 
-    }
+
     static remove() {
-      
     }
+
+
     static filter( matches ) {
       if(!matches) {
         throw Error('matches is empty' );  

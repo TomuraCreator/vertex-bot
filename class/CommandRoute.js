@@ -13,6 +13,9 @@ const bot_answer = require('../doc_models/bot_answer');
 
 module.exports = class CommandRoute {
     constructor( bot_return, bot, collection ) {
+
+        this.status = null;
+
         this.collection = collection;
         this.id = bot_return.chat.id;
         this.command_index = ['/add', '/remove', '/change', '/find', '/filter'];
@@ -33,26 +36,27 @@ module.exports = class CommandRoute {
             try{
 
                 this.toFind(this.key_string, this.collection).forEach(elem => {
-                    const pretty = TextTransform.translateFieldstoRus(elem, 'Вы искали:')
+                    const pretty = TextTransform.translateFieldstoRus(elem, 'Вы искали:');
                     bot.sendMessage(this.id, pretty, {
                         parse_mode: 'Markdown'
-                    })
-                // console.log(pretty)
+                    });
                 });
             } catch(e) {
                 console.log(e);
             }
             
         } else if (this.command === this.command_index[0]) { // add
-            try{
-
-                this.toFind(this.key_string, this.collection).forEach(elem => {
-                    const pretty = TextTransform.translateFieldstoRus(elem, 'Вы искали:')
-                    bot.sendMessage(this.id, pretty, {
+            try {
+                this.generate_empoyee = this.toAdd(this.key_string, this.collection);
+                if(!this.generate_empoyee) {
+                    bot.sendMessage(this.id, bot_answer.generate_persone_error_md, {
                         parse_mode: 'Markdown'
                     })
-                console.log(pretty)
-                });
+                } else {
+                    // bot.sendMessage(this.id, bot_answer.generate_persone_error_md, {
+                    //     parse_mode: 'Markdown'
+                    // })
+                }
             } catch(e) {
                 console.log(e);
             }
@@ -87,7 +91,8 @@ module.exports = class CommandRoute {
      * @param {special mongo object} collection 
      */
     toAdd(key_string, collection) {
-
+        
+        return Commands.add( key_string, collection )
     }
 
 
