@@ -2,6 +2,7 @@ const TextTransform = require('./TextTransform');
 const Commands = require('./Commands');
 const BaseManipulate = require('./BaseManipulate');
 const bot_answer = require('../doc_models/bot_answer');
+const fs = require('fs');
 
 /**
  * @class CommandRoute 
@@ -13,13 +14,10 @@ const bot_answer = require('../doc_models/bot_answer');
 
 module.exports = class CommandRoute {
     constructor( bot_return, bot, collection ) {
-
-        this.status = null;
-
         this.collection = collection;
         this.id = bot_return.chat.id;
         this.command_index = ['/add', '/remove', '/change', '/find', '/filter'];
-       
+
         this.command_string = bot_return.text;
         this.key_string = TextTransform.getArray(this.command_string).splice(1, 10);
 
@@ -46,21 +44,61 @@ module.exports = class CommandRoute {
             }
             
         } else if (this.command === this.command_index[0]) { // add
+
             try {
-                this.generate_empoyee = this.toAdd(this.key_string, this.collection);
-                if(!this.generate_empoyee) {
+                const empoyee = this.toAdd(this.key_string, this.collection);
+                
+                if(!empoyee) {
                     bot.sendMessage(this.id, bot_answer.generate_persone_error_md, {
                         parse_mode: 'Markdown'
                     })
                 } else {
-                    // bot.sendMessage(this.id, bot_answer.generate_persone_error_md, {
-                    //     parse_mode: 'Markdown'
-                    // })
+  
+                    const translate_employee = TextTransform.translateFieldstoRus(empoyee);
+ 
+                    fs.writeFile('./state/state.json', JSON.stringify(empoyee, null,2), (error) => {
+                                          
+                        bot.sendMessage(this.id, translate_employee, {
+                            parse_mode: 'Markdown',
+                            reply_markup: {
+                                inline_keyboard: [
+                                    [
+                                        {
+                                            text: "отменить",
+                                            callback_data: "no"
+                                        }
+                                    ],
+                                    [
+                                        {
+                                            text: "подтвердить",
+                                            callback_data: "yes_add"
+                                        }
+                                    ],
+                                    // [
+                                    //     {
+                                    //         text: "переписать",
+                                    //         callback_data: "rewrite"
+                                    //     }
+                                    // ]
+
+                                ]
+                            }
+                        })
+
+                    })
                 }
             } catch(e) {
                 console.log(e);
             }
-        } else {
+
+        } else if (this.command === this.command_index[1]) { // remove
+            try {
+                fs.readFile('../state/state.json', "utf8", (err, data) => {
+                    console.log(data)
+                })
+            } catch(e) {
+                console.log(e);
+            }
             
         }
     }

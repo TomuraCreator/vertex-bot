@@ -17,9 +17,9 @@ module.exports = class Commands {
       if(person_generate.surname 
         && person_generate.shift 
         && person_generate.position) {
-          return TextTransform.translateFieldstoRus(person_generate)
+          return person_generate;
         } else {
-          return false
+          return false;
         }
     }
 
