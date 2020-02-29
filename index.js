@@ -12,10 +12,10 @@ const path_json = './state/state.json';
 const path_text = './state/rewrite.txt';
 
 
-const TOKEN = process.env.BOT_TOKEN;
+const TOKEN = process.env.TOKEN;
 
 
-const mongo = new MongoClient(process.env.DB_URL, {
+const mongo = new MongoClient(process.env.MONGODB_URI, {
 	useNewUrlParser: true, 
 	useUnifiedTopology: true 
 });
