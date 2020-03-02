@@ -1,25 +1,36 @@
 process.env.NTBA_FIX_319 = 1;
 
-const server_port = process.env.YOUR_PORT || process.env.PORT || 80;
-const server_host = process.env.YOUR_HOST || '0.0.0.0';
-server.listen(server_port, server_host, function() {
-    console.log('Listening on port %d', server_port);
-});
-
 require('dotenv').config();
 
 const CommandRoute = require('./class/CommandRoute');
 const TelegramBot = require('node-telegram-bot-api');
-const bot_answer = require('./doc_models/bot_answer')
+const bot_answer = require('./doc_models/bot_answer');
+const express = require('express');
+const app = express();
+
 const MongoClient = require("mongodb").MongoClient;
 const fs = require('fs');
 
 const path_json = './state/state.json';
 const path_text = './state/rewrite.txt';
 
+app.get('/', (request, response) => {
+	response.send(`Server alive`);
+})
+
+
+const server_port = process.env.PORT || 80;
+const server_host = process.env.HOST;
+
+app.listen(server_port, server_host, (err) => {
+	if(err) {
+		return console.log(`something wrong`, err)
+
+	}
+	console.log(`Server is listening on ${server_port}`)
+})
 
 const TOKEN = process.env.TOKEN;
-
 
 const mongo = new MongoClient(process.env.MONGODB_URI, {
 	useNewUrlParser: true, 
@@ -31,7 +42,7 @@ const bot = new TelegramBot(TOKEN, {
 		autoStart: true,
 	} 
 })
-let state = null;
+
 mongo.connect(function( err, client ) {
 	const db = client.db('heroku_t8sdqpj3');
 	const collection = db.collection('vertex2');
