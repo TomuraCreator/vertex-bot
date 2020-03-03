@@ -16,8 +16,9 @@ module.exports = class CommandRoute {
     constructor( bot_return, bot, collection ) {
         this.collection = collection;
         this.id = bot_return.chat.id;
-        this.command_index = ['/add', '/remove', '/change', '/find', '/filter'];
-
+        this.path_array = './state/find_state.js';
+        this.command_index = ['/add', '/remove', '/change', '/find', '/filter', '/help'];
+        
         this.command_string = bot_return.text;
         this.key_string = TextTransform.getArray(this.command_string).splice(1, 10);
 
@@ -31,14 +32,12 @@ module.exports = class CommandRoute {
         }
 
         if( this.command === this.command_index[3] ) { // find
-            try{
-
-                this.toFind(this.key_string, this.collection).forEach(elem => {
-                    const pretty = TextTransform.translateFieldstoRus(elem, 'Вы искали:');
-                    bot.sendMessage(this.id, pretty, {
-                        parse_mode: 'Markdown'
-                    });
-                });
+            try {
+               
+                this.toFind(this.key_string, this.collection).toArray((err, result) => {                  
+                    bot.sendMessage(this.id, '_Список сотрудников_', this.parseRequestforFind(result));
+                })             
+                
             } catch(e) {
                 console.log(e);
             }
@@ -99,7 +98,16 @@ module.exports = class CommandRoute {
             } catch(e) {
                 console.log(e);
             }
-            
+             
+        } else if (this.command === this.command_index[5]) { // help
+            bot.sendMessage(this.id, bot_answer.command_help_md, {
+                parse_mode: 'Markdown'
+            });
+
+        } else {
+            bot.sendMessage(this.id, bot_answer.command_error_not_found_md, {
+                parse_mode: 'Markdown'
+            });
         }
     }
 
@@ -133,5 +141,37 @@ module.exports = class CommandRoute {
         return Commands.add( key_string, collection )
     }
 
+    /**
+     * парсит ответ от базы для формирования списка сотрудников 
+     * для вывода в инлайн клавиатуру
+     * @param {Array} array 
+     */
+    parseRequestforFind( array, parse = 'Markdown' ) {
+        if(!array) return null;
+        array.sort(( a, b )=> {
+            if (a.surname < b.surname) return -1
+            else if (a.surname > b.surname) return 1
+            else return 0
+        }) // сортировка по алфавиту
+        let object = {
+            parse_mode: parse,
+            reply_markup: {
+                inline_keyboard: [
+                    
+
+                ]
+            }
+        } // макет объекта опций
+        array.forEach((elem)=> {
+            let str = `${elem.surname} ${elem.first_name} ${elem.second_name}`
+            object.reply_markup.inline_keyboard.push([
+                {
+                    text: str,
+                    callback_data: elem._id
+                }
+            ])
+        })
+        return object
+    }
 
 }

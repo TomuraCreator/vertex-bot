@@ -5,14 +5,19 @@ require('dotenv').config();
 const CommandRoute = require('./class/CommandRoute');
 const TelegramBot = require('node-telegram-bot-api');
 const bot_answer = require('./doc_models/bot_answer');
+const TextTransform = require('./class/TextTransform');
 const express = require('express');
 const app = express();
+const ObjectId = require("mongodb").ObjectID;
 
 const MongoClient = require("mongodb").MongoClient;
 const fs = require('fs');
 
 const path_json = './state/state.json';
 const path_text = './state/rewrite.txt';
+const path_array = './state/find_state.js';
+
+
 
 app.get('/', (request, response) => {
 	response.send(`Server alive`);
@@ -54,9 +59,9 @@ mongo.connect(function( err, client ) {
 		
 		try {
 			if(arr.entities) {
-				state = new CommandRoute( arr, bot, collection );
+				new CommandRoute( arr, bot, collection );
 			} else {
-				console.log(state.state_employee);
+
 				bot.sendMessage(id, bot_answer.command_error_md, {
 					parse_mode: 'Markdown'
 				})
@@ -67,7 +72,7 @@ mongo.connect(function( err, client ) {
 	})
 
 	bot.on('callback_query', (query) => {
-		const {id} = query.message.chat
+		const {id} = query.message.chat			
 		if(query.data === 'yes_add') {
 			fs.readFile(path_json, "utf8", (error, data) => {
 				if(data) {
@@ -93,20 +98,18 @@ mongo.connect(function( err, client ) {
 			fs.writeFile(path_json, '', (error) => {
 				bot.sendMessage(id, 'Карточка была успешно удалена')
 			})
-		} else if(query.data === "rewrite") {
-			// fs.writeFile(path_json, '', (error) => {
-			// 	bot.sendMessage(id, 'Прошу исправьте запись и отправьте снова')
-			// 	fs.readFile(path_text, 'utf8', (error, data) => {
-			// 		bot.editMessageText('rewrite', {
-			// 			message_id: query.message.message_id,
-			// 			chat_id: id
-			// 		});
-			// 		console.log(query)
-			// 	})
-				
-			// })
-		}	
-		
+		}
+		try{
+			if(query.data) {
+				collection.find({ _id: ObjectId(query.data)}).toArray((err, result)=> {
+					bot.sendMessage(id, TextTransform.translateFieldstoRus(result[0], ''), {
+						parse_mode: 'Markdown'
+					})
+				})
+			}	
+		} catch(e) {
+			console.log(e)
+		}
 	})
 
 })
