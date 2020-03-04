@@ -64,43 +64,43 @@ mongo.connect(function( err, client ) {
 				const text_replace = TextTransform.getTranslateKey(TextTransform.getArray(arr.text))
 				const number = TextTransform.getArray(arr.text)[0]
 
-				state_collection.findOne({message_id: Number(number)}).then( data => {
-					
-					if(!data) {
+				state_collection.findOne({message_id: Number(number)}).then( result => {
+					console.log(1, result)
+					if(!result) {
 						bot.sendMessage(id, bot_answer.command_error_md,Markdown)
 						return
 					} else {
-						// collection.findOne({_id: ObjectId(data.id)})
-						// .then(data => {
-						// 	const replacees = TextTransform.getReplaseFields(data, text_replace);
-						// 	const translate = TextTransform.translateFieldstoRus(replacees,
-						// 		'_Подтвердите изменение_')
+						collection.findOne({_id: ObjectId(result.id)})
+						.then(data => {
+							console.log(2, data)
+							const replacees = TextTransform.getReplaseFields(data, text_replace);
+							const translate = TextTransform.translateFieldstoRus(replacees,
+								'_Подтвердите изменение_')
 
-						// 	bot.sendMessage(id, translate, {
-						// 			parse_mode: `Markdown`,
-						// 			reply_markup: {
-						// 				inline_keyboard: [
-						// 					[
-						// 						{
-						// 							text: "отменить",
-						// 							callback_data: String(['no-change', data.id])
-						// 						}
-						// 					],
-						// 					[
-						// 						{
-						// 							text: "подтвердить",
-						// 							callback_data: String(['yes-change', data.id])
-						// 						}
-						// 					]
-						// 				]
-						// 			}
-						// 		}
-						// 		)
-						// 		.then(() => {
-						// 			state_collection.insertOne(replacees).then().catch(e => console.log(e))
-						// 		});
-						// })
-						console.log(String(['yes-change', data.id]))
+							bot.sendMessage(id, translate, {
+									parse_mode: `Markdown`,
+									reply_markup: {
+										inline_keyboard: [
+											[
+												{
+													text: "отменить",
+													callback_data: String(['no-change', result.id])
+												}
+											],
+											[
+												{
+													text: "подтвердить",
+													callback_data: String(['yes-change', result.id])
+												}
+											]
+										]
+									}
+								}
+								)
+								.then(() => {
+									state_collection.insertOne(replacees).then().catch(e => console.log(e))
+								});
+						})
 					}
 				})
 			}
@@ -211,40 +211,46 @@ mongo.connect(function( err, client ) {
 			}
 		} else if(callback_array[0] === "no-change") {
 			try {
-				// state_collection.findOneAndDelete({id: callback_array[1]}).then((result) => {
-				// if(!result) {
-				// 	bot.sendMessage(id, "Срок действия команды истёк");
-				// 	return
-				// } else {
-				// 	state_collection.findOneAndDelete({_id: ObjectId(callback_array[1])}).then(()=> {
-				// 		bot.sendMessage(id, "Изменение отменено. Промежуточные данные очищены.");
-				// 	}).catch(e => console.log(e))
-				// }
-				// }).catch(e => {
-				// 	console.log(e)
-				// })
-				console.log(query)
+				state_collection.findOneAndDelete({id: callback_array[1]}).then((result) => {
+				if(!result) {
+					bot.sendMessage(id, "Срок действия команды истёк");
+					return
+				} else {
+					state_collection.findOneAndDelete({_id: ObjectId(callback_array[1])}).then(()=> {
+						bot.sendMessage(id, "Изменение отменено. Промежуточные данные очищены.");
+					}).catch(e => console.log(e))
+				}
+				}).catch(e => {
+					console.log(e)
+				})
 			} catch(e) {
 				console.log(e)
 			}
 			
 		} else if(callback_array[0] === "yes-change") {
 			try {
-				console.log()
-				// state_collection.findOne({_id: ObjectId(callback_array[1])}).then((result)=> {
-				// 	collection.findOneAndReplace({id: callback_array[1]}, result).then((result) => {
-				// 		if(!result) {
-				// 			state_collection.findOneAndDelete({_id: ObjectId(callback_array[1])}, (err, result)=> {
-				// 				state_collection.findOneAndDelete({id: callback_array[1]})
-				// 				console.log(`Промежуточные данные очищены. 
-				// 				Карточка сотрудника сохранена`)
-				// 			})
-				// 		}
-				// 	}).catch(e => {console.log(e)})
+				state_collection.findOne({_id: ObjectId(callback_array[1])}).then((result)=> {
+					if(!result) {
+						bot.sendMessage(id, "срок действия команды истёк");
+						return
+					} // если во временной базе не найден сотрудник
+					console.log(11, result)
+					collection.findOneAndReplace({_id: ObjectId(callback_array[1])}, result).then((result) => {
+						console.log(12, result)
+						if(result) {
+							state_collection.findOneAndDelete({_id: ObjectId(callback_array[1])}, (err, result)=> {
+								console.log(13, result)
+								state_collection.findOneAndDelete({id: callback_array[1]})
+								bot.sendMessage(id, "Промежуточные данные очищены. Карточка сотрудника сохранена");
+								console.log(`Промежуточные данные очищены. 
+								Карточка сотрудника сохранена`)
+							})
+						} 
+					}).catch(e => {console.log(e)})
 
 					
-				// }).catch(e => console.log(e))
-				console.log(query)
+				}).catch(e => console.log(e))
+
 			} catch(e) {
 				console.log(e)
 			}	
