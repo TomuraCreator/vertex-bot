@@ -9,7 +9,7 @@ module.exports = class Commands {
      * @param {string} matches 
      * @param {special mongo object} collection 
      */
-    static add( matches, collection ) {
+    static add( matches) {
       if(!matches) {
         throw Error('matches is empty' );
       } 

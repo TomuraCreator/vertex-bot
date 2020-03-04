@@ -1,6 +1,5 @@
 const TextTransform = require('./TextTransform');
 const Commands = require('./Commands');
-const BaseManipulate = require('./BaseManipulate');
 const bot_answer = require('../doc_models/bot_answer');
 const fs = require('fs');
 
@@ -13,11 +12,12 @@ const fs = require('fs');
  */
 
 module.exports = class CommandRoute {
-    constructor( bot_return, bot, collection ) {
+    constructor( bot_return, bot, collection, state_collection ) {
         this.collection = collection;
+        this.state_collection = state_collection;
         this.id = bot_return.chat.id;
         this.path_array = './state/find_state.js';
-        this.command_index = ['/add', '/remove', '/change', '/find', '/filter', '/help'];
+        this.command_index = ['/add', '/remove', '/change', '/find', '/filter', '/help', '/info'];
         
         this.command_string = bot_return.text;
         this.key_string = TextTransform.getArray(this.command_string).splice(1, 10);
@@ -52,11 +52,10 @@ module.exports = class CommandRoute {
                         parse_mode: 'Markdown'
                     })
                 } else {
-  
-                    const translate_employee = TextTransform.translateFieldstoRus(empoyee);
- 
-                    fs.writeFile('./state/state.json', JSON.stringify(empoyee, null,2), (error) => {
-                                          
+                    const translate_employee = TextTransform.translateFieldstoRus(empoyee); 
+                    this.state_collection.insertOne(empoyee).then((data) => {
+                        console.log(data.insertedId)
+                        
                         bot.sendMessage(this.id, translate_employee, {
                             parse_mode: 'Markdown',
                             reply_markup: {
@@ -64,27 +63,19 @@ module.exports = class CommandRoute {
                                     [
                                         {
                                             text: "отменить",
-                                            callback_data: "no"
+                                            callback_data: String(['no', data.insertedId])
                                         }
                                     ],
                                     [
                                         {
                                             text: "подтвердить",
-                                            callback_data: "yes_add"
+                                            callback_data: String(['yes', data.insertedId])
                                         }
                                     ],
-                                    // [
-                                    //     {
-                                    //         text: "переписать",
-                                    //         callback_data: "rewrite"
-                                    //     }
-                                    // ]
-
                                 ]
                             }
                         })
-
-                    })
+                    })                
                 }
             } catch(e) {
                 console.log(e);
@@ -136,9 +127,9 @@ module.exports = class CommandRoute {
      * @param {string} key_string 
      * @param {special mongo object} collection 
      */
-    toAdd(key_string, collection) {
+    toAdd(key_string) {
         
-        return Commands.add( key_string, collection )
+        return Commands.add( key_string)
     }
 
     /**
@@ -156,10 +147,7 @@ module.exports = class CommandRoute {
         let object = {
             parse_mode: parse,
             reply_markup: {
-                inline_keyboard: [
-                    
-
-                ]
+                inline_keyboard: []
             }
         } // макет объекта опций
         array.forEach((elem)=> {
@@ -167,7 +155,7 @@ module.exports = class CommandRoute {
             object.reply_markup.inline_keyboard.push([
                 {
                     text: str,
-                    callback_data: elem._id
+                    callback_data: String(['person', elem._id])
                 }
             ])
         })

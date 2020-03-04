@@ -13,16 +13,11 @@ const ObjectId = require("mongodb").ObjectID;
 const MongoClient = require("mongodb").MongoClient;
 const fs = require('fs');
 
-const path_json = './state/state.json';
 const path_text = './state/rewrite.txt';
-const path_array = './state/find_state.js';
-
-
 
 app.get('/', (request, response) => {
 	response.send(`Server alive`);
 })
-
 
 const server_port = process.env.PORT || 80;
 const server_host = process.env.HOST;
@@ -30,9 +25,8 @@ const server_host = process.env.HOST;
 app.listen(server_port, server_host, (err) => {
 	if(err) {
 		return console.log(`something wrong`, err)
-
 	}
-	console.log(`Server is listening on ${server_port}`)
+	console.log(`Server is listening port on ${server_port}`)
 })
 
 const TOKEN = process.env.TOKEN;
@@ -49,19 +43,20 @@ const bot = new TelegramBot(TOKEN, {
 })
 
 mongo.connect(function( err, client ) {
+	if(err) throw Error(`Something went wrong: ${err}`)
 	const db = client.db('heroku_t8sdqpj3');
-	const collection = db.collection('vertex2');
+	const collection = db.collection('vertex2'); //основная коллекция
+	const state_collection = db.collection('state'); // коллекция для промежуточных данных
 	console.log("MongoBD has connected...")
 
 	bot.on('message', (arr) => {
 		fs.writeFileSync(path_text, arr.text);
 		const {id} = arr.chat;
 		
-		try {
+		try { // если команда, запускаем распознавание команд
 			if(arr.entities) {
-				new CommandRoute( arr, bot, collection );
+				new CommandRoute( arr, bot, collection, state_collection );
 			} else {
-
 				bot.sendMessage(id, bot_answer.command_error_md, {
 					parse_mode: 'Markdown'
 				})
@@ -72,43 +67,56 @@ mongo.connect(function( err, client ) {
 	})
 
 	bot.on('callback_query', (query) => {
-		const {id} = query.message.chat			
-		if(query.data === 'yes_add') {
-			fs.readFile(path_json, "utf8", (error, data) => {
-				if(data) {
-					try {
-						collection.insertOne(JSON.parse(data)).then(data => {
-							fs.writeFile(path_json, '', (error) => {
-								console.log('Remove successful')
-							})
-							
-						});
-						bot.sendMessage(id, 'Сотрудник 	успешно добавлен в базу данных');
-						
-					} catch(e) {
-						console.log(e)
+		const {id} = query.message.chat	
+		const callback_array = query.data.split(',');
+		
+		if(callback_array[0] === 'yes') {
+			try {
+				state_collection.find({_id: ObjectId(callback_array[1])}).toArray((err, data) => {
+					if(data.length === 0) {
+						bot.sendMessage(id, '_Такого сотрудника не существует_',
+								{
+									parse_mode: 'Markdown'
+								})
+						return
 					}
-					// console.log(JSON.parse(data))
-				} else {
-					bot.sendMessage(id, 'Карточка сотрудника была очищена. ВВедите запрос заново.');
-				}
-			})
-			
-		} else if(query.data === "no") {
-			fs.writeFile(path_json, '', (error) => {
-				bot.sendMessage(id, 'Карточка была успешно удалена')
-			})
-		}
-		try{
-			if(query.data) {
-				collection.find({ _id: ObjectId(query.data)}).toArray((err, result)=> {
+					collection.insertOne(data[0]).then(data => {
+						bot.sendMessage(id, 'Сотрудник 	успешно добавлен в базу данных').then(()=> {
+							state_collection.findOneAndDelete({_id: ObjectId(callback_array[1])}).then((data)=> {
+								bot.sendMessage(id, '_Промежуточные данные очищены_',
+								{
+									parse_mode: 'Markdown'
+								})
+							})
+						});
+
+					})
+				})
+			} catch(e) {
+				console.log(e)
+			}
+		} else if(callback_array[0] === "no") {
+			try {
+				state_collection.findOneAndDelete({_id: ObjectId(callback_array[1])}).then(()=> {
+					bot.sendMessage(id, '_Промежуточные данные очищены_',
+					{
+						parse_mode: 'Markdown'
+					})
+				})
+			} catch(e) {
+				console.log(e)
+			}
+		} else if(callback_array[0] === "person") {
+			try {
+				collection.find({ _id: ObjectId(callback_array[1])}).toArray((err, result)=> {
 					bot.sendMessage(id, TextTransform.translateFieldstoRus(result[0], ''), {
 						parse_mode: 'Markdown'
 					})
 				})
-			}	
-		} catch(e) {
-			console.log(e)
+			} catch(e) {
+				console.log(e);
+			}
+			
 		}
 	})
 
