@@ -72,6 +72,12 @@ module.exports = class CommandRoute {
                                             callback_data: String(['yes', data.insertedId])
                                         }
                                     ],
+                                    [
+                                        {
+                                            text: "изменить",
+                                            callback_data: String(['change', data.insertedId]) 
+                                        }
+                                    ]
                                 ]
                             }
                         })
@@ -83,9 +89,32 @@ module.exports = class CommandRoute {
 
         } else if (this.command === this.command_index[1]) { // remove
             try {
-                fs.readFile('../state/state.json', "utf8", (err, data) => {
-                    console.log(data)
-                })
+                this.toFind(this.key_string, this.collection).toArray((err, result) => { 
+                    if(!this.key_string) throw Error("Всё очень плохо")                 
+                    const translate_employee = TextTransform.translateFieldstoRus(result[0], "Удаление сотрудника"); 
+
+                    console.log(result[0])
+                        
+                    bot.sendMessage(this.id, translate_employee, {
+                        parse_mode: 'Markdown',
+                        reply_markup: {
+                            inline_keyboard: [
+                                [
+                                    {
+                                        text: "отменить",
+                                        callback_data: String(['no-delete', null])
+                                    }
+                                ],
+                                [
+                                    {
+                                        text: "подтвердить",
+                                        callback_data: String(['delete', result[0]._id])
+                                    }
+                                ],
+                            ]
+                        }
+                    })
+                }) 
             } catch(e) {
                 console.log(e);
             }
@@ -95,6 +124,16 @@ module.exports = class CommandRoute {
                 parse_mode: 'Markdown'
             });
 
+        } else if(this.command === this.command_index[2]) { //change
+            try {
+               
+                this.toFindOne(this.key_string, this.collection).toArray((err, result) => {                  
+                    bot.sendMessage(this.id, '_Список сотрудников_', this.parseRequestforFind(result));
+                })             
+                
+            } catch(e) {
+                console.log(e);
+            }
         } else {
             bot.sendMessage(this.id, bot_answer.command_error_not_found_md, {
                 parse_mode: 'Markdown'
@@ -109,6 +148,15 @@ module.exports = class CommandRoute {
         } else {
             return false
         }
+    }
+    /**
+     * Обращается к коллекции и возвращает 
+     * первое совпадение с запросом 
+     * @param {string} key_string 
+     * @param {special mongo object} collection 
+     */
+    toFindOne(key_string, collection) {
+        return Commands.findOne( key_string, collection )
     }
 
     /**

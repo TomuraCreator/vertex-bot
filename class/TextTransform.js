@@ -112,4 +112,29 @@ module.exports = class TextTransform {
         })
         return configure_person;
     }
+
+    /**
+     *Заменяет поля в объекте на "object" на поля в объекте "obj_fields"
+     * @param {*} object 
+     * @param {*} obj_fields 
+     */
+    static getReplaseFields( object, obj_fields ) {
+        
+        try {
+            if(object && obj_fields) {
+                let replaces = Object.assign({}, object);
+                for(let value in obj_fields) {
+                    replaces[value] = obj_fields[value];
+                    
+                }
+                return replaces;
+            } else {
+                return false
+            }
+            
+        } catch(e) {
+            console.log(e)
+        }
+        
+    }
 }

@@ -52,5 +52,19 @@ module.exports = class Commands {
       const translate_key = TextTransform.getTranslateKey( matches )
       return collection.find(translate_key)
     }
+
+    /**
+     * 
+     * @param {array || string} matches 
+     * @param {object} collection 
+     */
+    static findOne( matches, collection ) {
+      if(!matches) {
+        throw Error('matches is empty' );  
+      } 
+
+      const translate_key = TextTransform.getTranslateKey( matches )
+      return collection.findOne(translate_key)
+    }
     
 } 

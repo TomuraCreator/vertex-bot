@@ -15,6 +15,10 @@ const fs = require('fs');
 
 const path_text = './state/rewrite.txt';
 
+const Markdown = {
+	parse_mode: 'Markdown'
+}
+
 app.get('/', (request, response) => {
 	response.send(`Server alive`);
 })
@@ -57,8 +61,47 @@ mongo.connect(function( err, client ) {
 			if(arr.entities) {
 				new CommandRoute( arr, bot, collection, state_collection );
 			} else {
-				bot.sendMessage(id, bot_answer.command_error_md, {
-					parse_mode: 'Markdown'
+				const text_replace = TextTransform.getTranslateKey(TextTransform.getArray(arr.text))
+				const number = TextTransform.getArray(arr.text)[0]
+
+				state_collection.findOne({message_id: Number(number)}).then( data => {
+					
+					if(!data) {
+						bot.sendMessage(id, bot_answer.command_error_md,Markdown)
+						return
+					} else {
+						// collection.findOne({_id: ObjectId(data.id)})
+						// .then(data => {
+						// 	const replacees = TextTransform.getReplaseFields(data, text_replace);
+						// 	const translate = TextTransform.translateFieldstoRus(replacees,
+						// 		'_Подтвердите изменение_')
+
+						// 	bot.sendMessage(id, translate, {
+						// 			parse_mode: `Markdown`,
+						// 			reply_markup: {
+						// 				inline_keyboard: [
+						// 					[
+						// 						{
+						// 							text: "отменить",
+						// 							callback_data: String(['no-change', data.id])
+						// 						}
+						// 					],
+						// 					[
+						// 						{
+						// 							text: "подтвердить",
+						// 							callback_data: String(['yes-change', data.id])
+						// 						}
+						// 					]
+						// 				]
+						// 			}
+						// 		}
+						// 		)
+						// 		.then(() => {
+						// 			state_collection.insertOne(replacees).then().catch(e => console.log(e))
+						// 		});
+						// })
+						console.log(String(['yes-change', data.id]))
+					}
 				})
 			}
 		} catch(e) {
@@ -73,20 +116,12 @@ mongo.connect(function( err, client ) {
 		if(callback_array[0] === 'yes') {
 			try {
 				state_collection.find({_id: ObjectId(callback_array[1])}).toArray((err, data) => {
-					if(data.length === 0) {
-						bot.sendMessage(id, '_Такого сотрудника не существует_',
-								{
-									parse_mode: 'Markdown'
-								})
-						return
-					}
+					
 					collection.insertOne(data[0]).then(data => {
 						bot.sendMessage(id, 'Сотрудник 	успешно добавлен в базу данных').then(()=> {
 							state_collection.findOneAndDelete({_id: ObjectId(callback_array[1])}).then((data)=> {
 								bot.sendMessage(id, '_Промежуточные данные очищены_',
-								{
-									parse_mode: 'Markdown'
-								})
+								Markdown)
 							})
 						});
 
@@ -98,10 +133,11 @@ mongo.connect(function( err, client ) {
 		} else if(callback_array[0] === "no") {
 			try {
 				state_collection.findOneAndDelete({_id: ObjectId(callback_array[1])}).then(()=> {
-					bot.sendMessage(id, '_Промежуточные данные очищены_',
-					{
-						parse_mode: 'Markdown'
-					})
+					if(data.length === 0) {
+						bot.sendMessage(id, '_Такого сотрудника не существует_', Markdown)
+						return
+					}
+					bot.sendMessage(id, '_Промежуточные данные очищены_', Markdown)
 				})
 			} catch(e) {
 				console.log(e)
@@ -110,13 +146,110 @@ mongo.connect(function( err, client ) {
 			try {
 				collection.find({ _id: ObjectId(callback_array[1])}).toArray((err, result)=> {
 					bot.sendMessage(id, TextTransform.translateFieldstoRus(result[0], ''), {
-						parse_mode: 'Markdown'
+						parse_mode: 'Markdown',
+						reply_markup: {
+							inline_keyboard: [
+								[
+									{
+										text: "изменить",
+										callback_data: String(['change', callback_array[1]]) 
+									}
+								]
+							]
+						}
 					})
 				})
 			} catch(e) {
 				console.log(e);
 			}
 			
+		} else if(callback_array[0] === "delete") {
+			try {
+				collection.findOneAndDelete({ _id: ObjectId(callback_array[1])}).then((result)=> {
+					if(!result.value) {
+						bot.sendMessage(id, "_Срок действия команды истёк_", Markdown)
+						return
+					}
+					bot.sendMessage(id, "_Сотрудник удалён из базы данных_", Markdown)
+				}).catch(err => console.log(`Deleting has been bad: ${err}`))
+			} catch(e) {
+				console.log(e);
+			}
+			
+		} else if(callback_array[0] === "no-delete") {
+			try {
+				bot.sendMessage(id, "_Действие отменено_", Markdown)
+			} catch(e) {
+				console.log(e);
+			}
+
+		} else if(callback_array[0] === "change") {
+			try {
+				const state_data = {
+					id: callback_array[1],
+					message_id: query.message.message_id
+				}	
+				bot.sendMessage(id, bot_answer.bot_answer_alert_change_md, Markdown).then((data)=> { //объект с данными по изменяемой карточке 
+					state_collection.findOne({id: callback_array[1]}).then((result) => {
+						if(!result) {
+							state_collection.insertOne(state_data).then((data)=> {
+								bot.sendMessage(id, bot_answer.bot_answer_alert_text_md(data.ops[0].message_id), Markdown)
+								// console.log(data)
+							}).catch(e => {
+								console.log(e)
+							})
+						} else {
+							state_data.message_id = data.message_id;
+							state_collection.replaceOne({id: callback_array[1]}, state_data)
+							bot.sendMessage(id, bot_answer.bot_answer_alert_text_md(data.message_id), Markdown)
+							// console.log(data.message_id)
+						}
+					})
+				})
+			} catch(e) {
+				console.log(e);
+			}
+		} else if(callback_array[0] === "no-change") {
+			try {
+				// state_collection.findOneAndDelete({id: callback_array[1]}).then((result) => {
+				// if(!result) {
+				// 	bot.sendMessage(id, "Срок действия команды истёк");
+				// 	return
+				// } else {
+				// 	state_collection.findOneAndDelete({_id: ObjectId(callback_array[1])}).then(()=> {
+				// 		bot.sendMessage(id, "Изменение отменено. Промежуточные данные очищены.");
+				// 	}).catch(e => console.log(e))
+				// }
+				// }).catch(e => {
+				// 	console.log(e)
+				// })
+				console.log(query)
+			} catch(e) {
+				console.log(e)
+			}
+			
+		} else if(callback_array[0] === "yes-change") {
+			try {
+				console.log()
+				// state_collection.findOne({_id: ObjectId(callback_array[1])}).then((result)=> {
+				// 	collection.findOneAndReplace({id: callback_array[1]}, result).then((result) => {
+				// 		if(!result) {
+				// 			state_collection.findOneAndDelete({_id: ObjectId(callback_array[1])}, (err, result)=> {
+				// 				state_collection.findOneAndDelete({id: callback_array[1]})
+				// 				console.log(`Промежуточные данные очищены. 
+				// 				Карточка сотрудника сохранена`)
+				// 			})
+				// 		}
+				// 	}).catch(e => {console.log(e)})
+
+					
+				// }).catch(e => console.log(e))
+				console.log(query)
+			} catch(e) {
+				console.log(e)
+			}	
+				
+				
 		}
 	})
 
