@@ -6,10 +6,9 @@ const CommandRoute = require('./class/CommandRoute');
 const TelegramBot = require('node-telegram-bot-api');
 const bot_answer = require('./doc_models/bot_answer');
 const TextTransform = require('./class/TextTransform');
-const express = require('express');
-const app = express();
+const DateShedule = require('./class/DateShedule')
+const express = require('./express')
 const ObjectId = require("mongodb").ObjectID;
-const shedule = require('node-schedule');
 
 const MongoClient = require("mongodb").MongoClient;
 const fs = require('fs');
@@ -18,21 +17,8 @@ const path_text = './state/rewrite.txt';
 
 const Markdown = {
 	parse_mode: 'Markdown'
-}
+} // parser for a bot message out 
 
-app.get('/', (request, response) => {
-	response.send(`Server alive`);
-})
-
-const server_port = process.env.PORT || 80;
-const server_host = process.env.HOST;
-
-app.listen(server_port, server_host, (err) => {
-	if(err) {
-		return console.log(`something wrong`, err)
-	}
-	console.log(`Server is listening port on ${server_port}`)
-})
 
 const TOKEN = process.env.TOKEN;
 
@@ -53,11 +39,15 @@ mongo.connect(function( err, client ) {
 	const collection = db.collection('vertex2'); //основная коллекция
 	const state_collection = db.collection('state'); // коллекция для промежуточных данных
 	console.log("MongoBD has connected...")
+	
+	const shedule = new DateShedule(collection, bot);
+	shedule.sheduleDateOfBirth({ hour: 8 }) // оповещение каждый день в 8,00
+	shedule.sheduleDateOfBirth({ hour: 20 }) // оповещение каждый день в 20,00
 
 	bot.on('message', (arr) => {
 		fs.writeFileSync(path_text, arr.text);
 		const {id} = arr.chat;
-		
+		console.log(id)
 		try { // если команда, запускаем распознавание команд
 			if(arr.entities) {
 				new CommandRoute( arr, bot, collection, state_collection );

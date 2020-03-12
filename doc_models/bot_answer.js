@@ -28,5 +28,15 @@ _/help_ - выводит список команд
     bot_answer_alert_text_md(a) {
       return `Строка должна начинаться с номера ${a}
       Пример: ${a} _пол_-женский _отпуск_-дни-14`
+    },
+    bot_answer_birth_md( obj ) {
+        const {first_name, surname, date_of_birth, gender} = obj;
+        const date = date_of_birth.split('/');
+        const year = new Date().getUTCFullYear() - date[2];
+        const herHis = (gender === 'мужской') ? 'ему' : 'ей';
+        return `
+        ${first_name} ${surname} отмечает день рождения!
+        Сегодня ${herHis} исполняется ${year}
+        `          
     }
 }
