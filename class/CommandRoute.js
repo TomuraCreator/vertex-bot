@@ -13,6 +13,7 @@ const fs = require('fs');
 
 module.exports = class CommandRoute {
     constructor( bot_return, bot, collection, state_collection ) {
+        this.bot = bot
         this.collection = collection;
         this.state_collection = state_collection;
         this.id = bot_return.chat.id;
@@ -134,6 +135,18 @@ module.exports = class CommandRoute {
             } catch(e) {
                 console.log(e);
             }
+        } else if(this.command === this.command_index[6]) { //info
+            try {
+               
+                const infoObj = this.getInfoObject();
+                console.log(infoObj)
+
+                
+                
+                
+            } catch(e) {
+                console.log(e);
+            }
         } else {
             bot.sendMessage(this.id, bot_answer.command_error_not_found_md, {
                 parse_mode: 'Markdown'
@@ -155,10 +168,52 @@ module.exports = class CommandRoute {
      * @param {string} key_string 
      * @param {special mongo object} collection 
      */
+
     toFindOne(key_string, collection) {
         return Commands.findOne( key_string, collection )
     }
 
+    /**
+     * Возвращает объект с количеством сотрудников 
+     */
+    getInfoObject() {
+        
+        this.collection.find().toArray((err, data)=> {
+            if(data.lenght === 0) throw Error('Was returned empty array')
+            let arrAvailable = ['auto', 'child', 'is_ill', 'is_vacation']
+            let object = {
+                "мастер": [],
+                "аппаратчик": [],
+                "гранулировщик": [],
+                "онфл": [],
+                "обработчик": [],
+                "фасовщик": [],
+                "технолог": [],
+                "уборщик": [],
+                "обработчик/тары": []
+            }
+            data.forEach((value) => {
+                if(value.position in object) {
+                    if(value[arrAvailable[0]].available || 
+                        value[arrAvailable[1]].available ||
+                        value[arrAvailable[2]].available ||
+                        value[arrAvailable[3]].available) {
+                        return
+                    }
+                    object[value.position].push(value);
+                }
+            })
+            let counter = 0
+            for(let value in object) {
+                object[value] = object[value].length;
+                counter += object[value];
+            }
+            object["итого"] = counter;
+            this.bot.sendMessage(this.id, JSON.stringify(object, null, 2))               
+        })
+        
+    }
+    
     /**
      * Обращается к методу связи с бд и возвращает 
      * ответ в обработанном виде
@@ -176,8 +231,9 @@ module.exports = class CommandRoute {
      * @param {special mongo object} collection 
      */
     toAdd(key_string) {
-        
-        return Commands.add( key_string)
+        return TextTransform.setAvailable(
+            Commands.add( key_string )
+        )
     }
 
     /**
