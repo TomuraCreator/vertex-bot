@@ -41,8 +41,8 @@ mongo.connect(function( err, client ) {
 	console.log("MongoBD has connected...")
 	
 	const shedule = new DateShedule(collection, bot);
-	shedule.sheduleDateOfBirth({ minute: 0, second: 0, hour: 8,  day: 1}) // оповещение каждый день в 8,00
-	shedule.sheduleDateOfBirth({ minute: 0, second: 0, hour: 20,  day: 1 }) // оповещение каждый день в 20,00
+	shedule.sheduleDateOfBirth({ minute: 0, second: 0, hour: 8}) // оповещение каждый день в 8,00
+	shedule.sheduleDateOfBirth({ minute: 0, second: 0, hour: 20}) // оповещение каждый день в 20,00
 
 	bot.on('message', (arr) => {
 		fs.writeFileSync(path_text, arr.text);

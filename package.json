@@ -8,7 +8,9 @@
   },
   "author": "Tomura_Creator",
   "license": "ISC",
-  "devDependencies": {},
+  "devDependencies": {
+    "nodemon": "^2.0.2"
+  },
   "dependencies": {
     "@babel/cli": "^7.8.4",
     "@babel/core": "^7.8.4",
@@ -17,7 +19,6 @@
     "mongodb": "^3.5.3",
     "mongoose": "^5.9.1",
     "node-schedule": "^1.3.2",
-    "node-telegram-bot-api": "^0.40.0",
-    "nodemon": "^2.0.2"
+    "node-telegram-bot-api": "^0.40.0"
   }
 }
