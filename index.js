@@ -7,7 +7,6 @@ const TelegramBot = require('node-telegram-bot-api');
 const bot_answer = require('./doc_models/bot_answer');
 const TextTransform = require('./class/TextTransform');
 const DateShedule = require('./class/DateShedule')
-const express = require('./express')
 const ObjectId = require("mongodb").ObjectID;
 
 const MongoClient = require("mongodb").MongoClient;
@@ -27,11 +26,11 @@ const mongo = new MongoClient(process.env.MONGODB_URI, {
 	useUnifiedTopology: true 
 });
 
-const bot = new TelegramBot(TOKEN, {
-	polling:{
-		autoStart: true,
-	} 
-})
+// const bot = new TelegramBot(TOKEN, {
+// 	polling:{
+// 		autoStart: true,
+// 	} 
+// })
 
 mongo.connect(function( err, client ) {
 	if(err) throw Error(`Something went wrong: ${err}`)
