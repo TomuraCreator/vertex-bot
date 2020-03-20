@@ -2,6 +2,8 @@ import { Info } from '../classes/Info'
 import { Help } from '../classes/Help'
 import { Find } from '../classes/Find'
 import { Add } from '../classes/Add'
+import { Delete } from '../classes/Delete'
+
 
 
 export class Fabric {
@@ -18,6 +20,9 @@ export class Fabric {
         },
         '/add': (bot: any, collection: any, state: any, chat: any) => {
             return new Add(bot, collection, state, chat);
+        },
+        '/remove': (bot: any, collection: any, state: any, chat: any) => {
+            return new Delete(bot, collection, state, chat);
         }
     }
 

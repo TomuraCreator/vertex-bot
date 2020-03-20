@@ -11,7 +11,7 @@ export class MainCallbackQuery {
         this.state = state;
         this.chat = chat;
 
-        this.callback_array = this.chat.data.split(',');
+        this.callback_array = this.chat.data.split(','); // data ответа от инлайн-клавиатуры
     }
 
     /**

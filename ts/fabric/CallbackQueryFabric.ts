@@ -25,7 +25,7 @@ export class CallbackQueryFabric{
             return new Allow(bot, collection, state, chat);
         },
         'delete': (bot: any, collection: any, state: any, chat:any) => {
-            return new Allow(bot, collection, state, chat);
+            return new Denied(bot, collection, state, chat);
         }
     }
 

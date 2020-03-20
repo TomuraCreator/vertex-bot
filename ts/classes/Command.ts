@@ -1,4 +1,4 @@
-
+import {TextTransform as Text} from './static/TextTrasform';
 /**
  * Класс для описания наследования классов команд
  */
@@ -9,17 +9,20 @@ export class Command {
      * @param {Object} state объект коллекции для промежуточных данных
      * @param {Object} collection объект коллекции для постоянных данных
      */
-    protected type: string = 'command'
+    protected type: string = 'command';
+    protected match_list: any; // объект для отправки запроса 
 
     constructor(protected bot: any, protected state: any, protected collection: any, protected chat: any) {
         if(!state && !collection) {
             throw Error('params is empty');
         }
-        // this.TOKEN = process.env.TOKEN;
+
         this.bot = bot;
         this.collection = collection;
         this.state = state;
         this.chat = chat;
+
+        this.match_list = Text.getTranslateKey(this.getArray( this.chat.text));
     }
 
     /**

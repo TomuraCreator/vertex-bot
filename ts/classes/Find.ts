@@ -10,8 +10,7 @@ export class Find extends Command {
     }
 
     private getFindList() : any {
-        const match: string[] = this.getArray( this.chat.text);
-        return this.collection.find(Text.getTranslateKey( match ))
+        return this.collection.find(this.match_list)
     }
 
     public sendPersonList() : void {

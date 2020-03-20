@@ -69,8 +69,9 @@ mongo.connect(function( err: string, client: any ) {
             command.sendPersonList();
         } else if(getType === 'add' ) {
             command.insertToState();
+        } else if(getType === 'delete' ) {
+            command.findPersonSendMessage();
         }
-        
     })
 
     bot.on('callback_query', (match: any ) => {
@@ -86,6 +87,8 @@ mongo.connect(function( err: string, client: any ) {
         }
         else if(type === 'no') {
             callback.clearStateBase();
+        } else if(type === 'delete') {
+            callback.deletePersonFromBase();
         }
         
     })
