@@ -1,6 +1,6 @@
 import { Fabric } from './fabric/Fabric'
 import {DateSchedule as Schedule} from './schedule/Schedule'
-import {CallbackQuery as Callback} from './classes/CallbackQuery'; 
+import {CallbackQueryFabric as Callback} from './fabric/CallbackQueryFabric'; 
 
 require('dotenv').config();
 
@@ -73,9 +73,12 @@ mongo.connect(function( err: string, client: any ) {
 
     bot.on('callback_query', (match: any ) => {
         const callback: any  = new Callback(bot, collection, state_collection, match)
+        const type: string = callback.getType();
+        if(type === 'person') {
+            callback.getPreviewPerson()
+        } else if(type === 'change') {
+            
+        }
         
     })
-    
-
-    
 })
