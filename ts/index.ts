@@ -1,4 +1,6 @@
 import { Fabric } from './fabric/Fabric'
+import {DateSchedule as Schedule} from './schedule/Schedule'
+import {CallbackQuery as Callback} from './classes/CallbackQuery'; 
 
 require('dotenv').config();
 
@@ -6,7 +8,7 @@ require('dotenv').config();
 const TelegramBot = require('node-telegram-bot-api');
 // const bot_answer = require('./doc_models/bot_answer');
 // const TextTransform = require('./class/TextTransform');
-const DateShedule = require('../class/DateShedule');
+
 const express = require('../config/express')
 const ObjectId = require("mongodb").ObjectID;
 
@@ -46,8 +48,34 @@ mongo.connect(function( err: string, client: any ) {
     
     console.log("MongoBD has connected...");
 
-    const command: any = new Fabric('/help', bot, collection, state_collection);
-    command.getType()
+    const schedule = new Schedule(collection, bot);
+    schedule.sheduleDateOfBirth([
+        {minute: 0, second: 0, hour: 8},
+        {minute: 0, second: 0, hour: 20}
+    ])
+
+    bot.on('message', (params: any) => {
+        
+        if(!params.entities) return
+
+        const command: any = new Fabric(bot, collection, state_collection, params);
+        const getType: string = command.getType();
+        console.log(process.env.PWD, __dirname)
+        if(getType === 'info') {
+            command.getInfoObject()
+        } else if(getType === 'help' ) {
+            command.readHelpMessage()
+        } else if(getType === 'find' ) {
+            command.sendPersonList();
+        }
+        
+    })
+
+    bot.on('callback_query', (match: any ) => {
+        const callback: any  = new Callback(bot, collection, state_collection, match)
+        
+    })
+    
 
     
 })

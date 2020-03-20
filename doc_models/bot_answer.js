@@ -35,7 +35,7 @@ _/help_ - выводит список команд
         const year = new Date().getUTCFullYear() - date[2];
         const herHis = (gender === 'мужской') ? 'ему' : 'ей';
         return `
-        ${first_name} ${surname} отмечает день рождения!
+        **${first_name} ${surname}** отмечает день рождения!
         Сегодня ${herHis} исполняется ${year}
         `          
     }

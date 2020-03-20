@@ -4,11 +4,13 @@
   "description": "telegram bot for checking homeworks",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "nodemon ./dist/index.js",
+    "watch": "tsc --watch"
   },
   "author": "Tomura_Creator",
   "license": "ISC",
   "devDependencies": {
+    "@types/node": "^13.9.2",
     "nodemon": "^2.0.2",
     "typescript": "^3.8.3"
   },
