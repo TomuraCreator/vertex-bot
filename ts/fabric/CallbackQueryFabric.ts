@@ -1,4 +1,8 @@
 import {CallbackPerson as Person} from '../classes/CallbackPerson';
+import {CallbackAllow as Allow} from '../classes/CallbackAllow';
+import {CallbackDenied as Denied} from '../classes/CallbackDenied';
+
+
 
 
 /**
@@ -10,6 +14,18 @@ export class CallbackQueryFabric{
     private arr_query: any = {
         'person': (bot: any, collection: any, state: any, chat:any) => {
             return new Person(bot, collection, state, chat);
+        },
+        'change': (bot: any, collection: any, state: any, chat:any) => {
+            return new Person(bot, collection, state, chat);
+        },
+        'no': (bot: any, collection: any, state: any, chat:any) => {
+            return new Denied(bot, collection, state, chat);
+        },
+        'yes': (bot: any, collection: any, state: any, chat:any) => {
+            return new Allow(bot, collection, state, chat);
+        },
+        'delete': (bot: any, collection: any, state: any, chat:any) => {
+            return new Allow(bot, collection, state, chat);
         }
     }
 

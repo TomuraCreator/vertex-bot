@@ -85,7 +85,7 @@ mongo.connect(function( err: string, client: any ) {
             callback.insertToBaseAllow();
         }
         else if(type === 'no') {
-            console.log(match)
+            callback.clearStateBase();
         }
         
     })
