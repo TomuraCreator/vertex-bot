@@ -1,22 +1,20 @@
 import {TextTransform as Text} from './static/TextTrasform';
+import {MainCallbackQuery as Main} from './MainCallbackQuery';
 
-export class CallbackPerson{
-    protected ObjectId: any = require("mongodb").ObjectID;
+export class CallbackPerson extends Main {
     readonly type: string = 'person';
 
-    public constructor(private bot: any, private state: any, private collection: any, private chat: any) {
-        this.bot = bot;
-        this.collection = collection;
-        this.state = state;
-        this.chat = chat;
+    public constructor(bot: any, state: any, collection: any, chat: any) {
+        super(bot, state, collection, chat)
     }
 
     public getPreviewPerson() : void {
         try {
-            const callback_array = this.chat.data.split(',');
-            this.collection.find({ _id: this.ObjectId(callback_array[1])}).toArray((err: string, result: any)=> {
-                this.bot.sendMessage(this.chat.message.chat.id,
-                    Text.translateFieldstoRus(result[0], ''),
+
+            this.collection.find({ _id: this.ObjectId(
+                    this.callback_array[1])})
+                    .toArray((err: string, result: any) => {
+                this.sendMessage(Text.translateFieldstoRus(result[0], ''),
                     {
                     parse_mode: 'Markdown',
                     reply_markup: {
@@ -24,7 +22,7 @@ export class CallbackPerson{
                             [
                                 {
                                     text: "изменить",
-                                    callback_data: String(['change', callback_array[1]]) 
+                                    callback_data: String(['change', this.callback_array[1]]) 
                                 }
                             ]
                         ]
@@ -36,10 +34,4 @@ export class CallbackPerson{
         }
     }
 
-    /**
-     * Возвращает тип объекта
-     */
-    public getType() : string {
-        return this.type;
-    }
 }

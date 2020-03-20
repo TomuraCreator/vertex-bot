@@ -60,13 +60,15 @@ mongo.connect(function( err: string, client: any ) {
 
         const command: any = new Fabric(bot, collection, state_collection, params);
         const getType: string = command.getType();
-        console.log(process.env.PWD, __dirname)
+
         if(getType === 'info') {
             command.getInfoObject()
         } else if(getType === 'help' ) {
             command.readHelpMessage()
         } else if(getType === 'find' ) {
             command.sendPersonList();
+        } else if(getType === 'add' ) {
+            command.insertToState();
         }
         
     })
@@ -78,6 +80,12 @@ mongo.connect(function( err: string, client: any ) {
             callback.getPreviewPerson()
         } else if(type === 'change') {
             
+
+        } else if(type === 'yes') {
+            callback.insertToBaseAllow();
+        }
+        else if(type === 'no') {
+            console.log(match)
         }
         
     })

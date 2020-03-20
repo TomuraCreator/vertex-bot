@@ -6,6 +6,7 @@ export class TextTransform {
 
     static keys = require(process.env.PWD + '/doc_models/translate_key');
     static person_pattern = require(process.env.PWD + '/doc_models/person');
+    
     static available = ["child", "is_ill", "is_vacation", "auto"];
 
     /**
@@ -82,7 +83,7 @@ export class TextTransform {
     }
 
 
-    static translateFieldstoEng( matches: any) {
+    static translateFieldstoEng( matches: any) :any{
         if(!matches) throw Error('not matches')
         const configure_person = Object.assign({}, TextTransform.person_pattern);
         const rus = TextTransform.keys.to_rus;

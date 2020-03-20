@@ -1,6 +1,8 @@
 import { Info } from '../classes/Info'
 import { Help } from '../classes/Help'
 import { Find } from '../classes/Find'
+import { Add } from '../classes/Add'
+
 
 export class Fabric {
 
@@ -13,6 +15,9 @@ export class Fabric {
         },
         '/find': (bot: any, collection: any, state: any, chat: any) => {
             return new Find(bot, collection, state, chat);
+        },
+        '/add': (bot: any, collection: any, state: any, chat: any) => {
+            return new Add(bot, collection, state, chat);
         }
     }
 
