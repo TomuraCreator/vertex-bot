@@ -1,4 +1,4 @@
-import {TextTransform as Text} from './static/TextTrasform';
+import {TextTransform as Text} from './static/TextTransform';
 /**
  * Класс для описания наследования классов команд
  */
@@ -11,6 +11,7 @@ export class Command {
      */
     protected type: string = 'command';
     protected match_list: any; // объект для отправки запроса 
+
 
     constructor(protected bot: any, protected state: any, protected collection: any, protected chat: any) {
         if(!state && !collection) {

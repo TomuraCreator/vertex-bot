@@ -1,12 +1,13 @@
 import {Command} from './Command';
-import {TextTransform as Text} from './static/TextTrasform';
-
+import {TextTransform as Text} from './static/TextTransform';
 
 export class Delete extends Command {
     readonly type: string = 'delete'
 
     public constructor(bot: any, state: object, collection: object, chat: any) {
         super(bot, collection, state, chat)
+
+        this.findPersonSendMessage();
     }
 
     /**
@@ -14,7 +15,7 @@ export class Delete extends Command {
      * @return {void}
      */
 
-    public findPersonSendMessage() : void {
+    private findPersonSendMessage() : void {
         try {
 
             this.collection.find(this.match_list).toArray((err: string, result: any) => { 

@@ -4,9 +4,15 @@ export class Info extends Command {
     readonly type: string = 'info';
     public constructor(bot: any, state: any, collection: any, chat:any) {
         super(bot, collection, state, chat)
+
+        this.getInfoObject();
     }
 
-    public getInfoObject() : void {
+    /**
+     * Формирует объект с количеством сотрудников на смене
+     *  
+     */
+    private getInfoObject() : void {
         try {       
             this.collection.find().toArray((err: any, data: any)=> {
                 if(data.lenght === 0) throw Error('Was returned empty array')
@@ -44,7 +50,7 @@ export class Info extends Command {
                 this.sendMessage(JSON.stringify(object, null, 2))               
             })
         } catch (err) {
-            console.log(err)
+            console.log(err) 
         }
     }
 }

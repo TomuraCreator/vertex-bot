@@ -1,14 +1,17 @@
-import {TextTransform as Text} from './static/TextTrasform';
 import {MainCallbackQuery as Main} from './MainCallbackQuery';
+import {TextTransform as Text} from './static/TextTransform';
+
 
 export class CallbackPerson extends Main {
     readonly type: string = 'person';
 
     public constructor(bot: any, state: any, collection: any, chat: any) {
         super(bot, state, collection, chat)
+
+        this.getPreviewPerson()
     }
 
-    public getPreviewPerson() : void {
+    private getPreviewPerson() : void {
         try {
 
             this.collection.find({ _id: this.ObjectId(

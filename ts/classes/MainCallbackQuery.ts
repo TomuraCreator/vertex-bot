@@ -1,3 +1,4 @@
+import {TextTransform as Text} from './static/TextTransform';
 
 export class MainCallbackQuery {
     protected ObjectId: any = require("mongodb").ObjectID;
@@ -11,23 +12,25 @@ export class MainCallbackQuery {
         this.state = state;
         this.chat = chat;
 
-        this.callback_array = this.chat.data.split(','); // data ответа от инлайн-клавиатуры
+        if(!!this.chat.data) { // если сообщение не дата инлайн клавиатуры
+            this.callback_array = this.chat.data.split(','); // data ответа от инлайн-клавиатуры
+        }
     }
 
     /**
-     * 
      * @param message 
      * @param {String} mode Markdown (md)
      * @return void
      */
-    public sendMessage(message: string, mode?: any) : void {
-        const {id} = this.chat.message.chat;
+    protected sendMessage(message: string, mode?: any) : any {
+        const id = (!!this.chat.message) ?  this.chat.message.chat.id :  this.chat.chat.id;
+
         if(mode === 'md') {
-            this.bot.sendMessage(id, message, {
+            return this.bot.sendMessage(id, message, {
                 parse_mode: 'Markdown'
             });
         } else {
-            this.bot.sendMessage(id, message, mode);
+            return this.bot.sendMessage(id, message, mode);
         }
         
     }

@@ -1,5 +1,5 @@
 import {Command} from './Command';
-import {TextTransform as Text} from './static/TextTrasform';
+import {TextTransform as Text} from './static/TextTransform';
 
 
 export class Add extends Command {
@@ -9,6 +9,7 @@ export class Add extends Command {
         super(bot, collection, state, chat)
         console.log(this.chat.text)
         this.match = this.getArray(this.chat.text).splice(1, 10);
+        this.insertToState()
     }
 
     private requireFieldToAdd( match: Array<string> ) : boolean {
@@ -22,11 +23,7 @@ export class Add extends Command {
         }
     }
 
-    public viewPersonAddCard() {
-
-    }
-
-    public insertToState() : void {
+    private insertToState() : void {
         const error_created: any = require(process.env.PWD + '/doc_models/bot_answer.js')
 
         if( !this.requireFieldToAdd(this.match) ) {

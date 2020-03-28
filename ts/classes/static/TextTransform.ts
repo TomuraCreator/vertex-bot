@@ -6,7 +6,7 @@ export class TextTransform {
 
     static keys = require(process.env.PWD + '/doc_models/translate_key');
     static person_pattern = require(process.env.PWD + '/doc_models/person');
-    
+
     static available = ["child", "is_ill", "is_vacation", "auto"];
 
     /**
@@ -47,7 +47,6 @@ export class TextTransform {
                                 ? "нет" 
                                 : json[value]
                         } \n`
-                        
                     }
                 } 
             }
@@ -63,6 +62,7 @@ export class TextTransform {
      * @return {object} параметры запроса
      * @memberof TextTransform
      */
+
     static getTranslateKey( key: any ) : any {
         if (!key) return false;
         if (typeof key === 'string' ) { // если строка преобразовать в массив 
@@ -78,11 +78,13 @@ export class TextTransform {
                 }   
             }
         })
-
         return replace_obj
     }
 
-
+    /**
+     * Перевод полей на русский 
+     * @param matches 
+     */
     static translateFieldstoEng( matches: any) :any{
         if(!matches) throw Error('not matches')
         const configure_person = Object.assign({}, TextTransform.person_pattern);
@@ -95,7 +97,6 @@ export class TextTransform {
                 } else {
                     configure_person[rus[arr_str[0]]] = arr_str[1];
                 }
-
             }
         })
         return configure_person;
@@ -112,17 +113,14 @@ export class TextTransform {
             if(object && obj_fields) {
                 let replaces = Object.assign({}, object);
                 for(let value in obj_fields) {
-                    replaces[value] = obj_fields[value];
-                    
+                    replaces[value] = obj_fields[value];  
                 }
                 return replaces;
             } else {
                 return false
             }
-            
         } catch(e) {
             console.log(e)
-        }
-        
+        }   
     }
 }

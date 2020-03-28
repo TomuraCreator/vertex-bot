@@ -1,6 +1,5 @@
 import {Command} from './Command';
-import {TextTransform as Text} from './static/TextTrasform';
-
+import {TextTransform as Text} from './static/TextTransform';
 /**
  * Класс для обработки команды /change
  */
