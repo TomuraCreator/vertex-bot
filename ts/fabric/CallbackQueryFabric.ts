@@ -1,8 +1,8 @@
 import {CallbackPerson as Person} from '../classes/CallbackPerson';
 import {CallbackAllow as Allow} from '../classes/CallbackAllow';
 import {CallbackDenied as Denied} from '../classes/CallbackDenied';
-
-
+import {CallbackChange as Change} from '../classes/CallbackChange';
+import {CallbackSetChanges as SetChanges} from '../classes/CallbackSetChanges';
 
 
 /**
@@ -16,16 +16,25 @@ export class CallbackQueryFabric{
             return new Person(bot, collection, state, chat);
         },
         'change': (bot: any, collection: any, state: any, chat:any) => {
-            return new Person(bot, collection, state, chat);
+            return new Change(bot, collection, state, chat);
         },
         'no': (bot: any, collection: any, state: any, chat:any) => {
+            return new Denied(bot, collection, state, chat);
+        },
+        'no-change': (bot: any, collection: any, state: any, chat:any) => {
             return new Denied(bot, collection, state, chat);
         },
         'yes': (bot: any, collection: any, state: any, chat:any) => {
             return new Allow(bot, collection, state, chat);
         },
+        'yes-change': (bot: any, collection: any, state: any, chat:any) => {
+            return new Allow(bot, collection, state, chat);
+        },
         'delete': (bot: any, collection: any, state: any, chat:any) => {
             return new Denied(bot, collection, state, chat);
+        },
+        'set': (bot: any, collection: any, state: any, chat:any) => {
+            return new SetChanges(bot, collection, state, chat);
         }
     }
 
@@ -35,16 +44,23 @@ export class CallbackQueryFabric{
         this.collection = collection;
         this.state = state;
         this.chat = chat;
-
-        const query: Array<string> = this.chat.data.split(',');
-
-        return this.arr_query[query[0]](
-            this.bot, 
-            this.collection, 
-            this.state,
-            this.chat
-            )
-        
+        if(this.chat.data) {
+            const query: Array<string> = this.chat.data.split(',');
+            return this.arr_query[query[0]](
+                this.bot, 
+                this.collection, 
+                this.state,
+                this.chat
+                )
+        } else {
+            return this.arr_query['set'](
+                this.bot, 
+                this.collection, 
+                this.state,
+                this.chat
+                )
+        }
+            
     }
 
 

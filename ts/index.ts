@@ -1,6 +1,7 @@
 import { Fabric } from './fabric/Fabric'
 import {DateSchedule as Schedule} from './schedule/Schedule'
 import {CallbackQueryFabric as Callback} from './fabric/CallbackQueryFabric'; 
+import { match } from 'assert';
 
 require('dotenv').config();
 
@@ -14,12 +15,6 @@ const ObjectId = require("mongodb").ObjectID;
 
 const MongoClient = require("mongodb").MongoClient;
 const fs = require('fs');
-
-// const path_text: string = './state/rewrite.txt';
-
-const Markdown: object = {
-	parse_mode: 'Markdown'
-} // parser for a bot message out 
 
 type env = string | undefined;
 
@@ -50,46 +45,38 @@ mongo.connect(function( err: string, client: any ) {
 
     const schedule = new Schedule(collection, bot);
     schedule.sheduleDateOfBirth([
-        {minute: 0, second: 0, hour: 8},
-        {minute: 0, second: 0, hour: 20}
+        {minute: 1, second: 1, hour: 8},
+        {minute: 1, second: 1, hour: 20}
     ])
 
     bot.on('message', (params: any) => {
         
         if(!params.entities) return
-
-        const command: any = new Fabric(bot, collection, state_collection, params);
-        const getType: string = command.getType();
-
-        if(getType === 'info') {
-            command.getInfoObject()
-        } else if(getType === 'help' ) {
-            command.readHelpMessage()
-        } else if(getType === 'find' ) {
-            command.sendPersonList();
-        } else if(getType === 'add' ) {
-            command.insertToState();
-        } else if(getType === 'delete' ) {
-            command.findPersonSendMessage();
-        }
+        try {
+            const command: any = new Fabric(bot, collection, state_collection, params);
+        } catch(e) {
+            console.log(e)
+        }  
+        
     })
 
     bot.on('callback_query', (match: any ) => {
-        const callback: any  = new Callback(bot, collection, state_collection, match)
-        const type: string = callback.getType();
-        if(type === 'person') {
-            callback.getPreviewPerson()
-        } else if(type === 'change') {
-            
+        try {
+            const callback: any  = new Callback(bot, collection, state_collection, match)
+        } catch(e) {
+            console.log(e)
+        }  
+    })
 
-        } else if(type === 'yes') {
-            callback.insertToBaseAllow();
-        }
-        else if(type === 'no') {
-            callback.clearStateBase();
-        } else if(type === 'delete') {
-            callback.deletePersonFromBase();
+    bot.onText(/^(\d+)/g, (match: any, msg: any) => { // обработчик изменения карточки 
+        try{
+            const callback: any  = new Callback(bot, collection, state_collection, match)
+        } catch(e) {
+            console.log(e)
         }
         
+
     })
+
+    
 })
