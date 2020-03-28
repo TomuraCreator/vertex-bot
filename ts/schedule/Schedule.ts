@@ -4,7 +4,6 @@
 
 const shedule: any = require('node-schedule');
 
-
 export class DateSchedule  {
     /**
      * Конструктор класса планирования, принимает на вход объект коллекции монго и объект бота
@@ -23,7 +22,7 @@ export class DateSchedule  {
 
     /**
      * Задаёт планировщик на соответствие дня рождения
-     * @param {Object | Array} param_obj
+     * @param {Object | Array<object>} param_obj
      */
     public sheduleDateOfBirth( param_obj: any | Array<any> ) : void {
         if(!param_obj) throw Error('Params not found');
