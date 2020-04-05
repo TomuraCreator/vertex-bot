@@ -3,6 +3,8 @@ import {CallbackAllow as Allow} from '../classes/CallbackAllow';
 import {CallbackDenied as Denied} from '../classes/CallbackDenied';
 import {CallbackChange as Change} from '../classes/CallbackChange';
 import {CallbackSetChanges as SetChanges} from '../classes/CallbackSetChanges';
+import {CallbackPositionShow as PositionShow} from '../classes/CallbackPositionShow';
+
 
 
 /**
@@ -35,6 +37,9 @@ export class CallbackQueryFabric{
         },
         'set': (bot: any, collection: any, state: any, chat:any) => {
             return new SetChanges(bot, collection, state, chat);
+        },
+        'position-show': (bot: any, collection: any, state: any, chat:any) => {
+            return new PositionShow(bot, collection, state, chat);
         }
     }
 
