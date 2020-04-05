@@ -3,10 +3,10 @@ import { Help } from '../classes/Help'
 import { Find } from '../classes/Find'
 import { Add } from '../classes/Add'
 import { Delete } from '../classes/Delete'
-import { Change } from '../classes/Change'
+// import { Change } from '../classes/Change'
 
-
-
+const PATH = process.env.PWD;
+const bot_answer = require(PATH + '/doc_models/bot_answer.js')
 
 export class Fabric {
 
@@ -26,9 +26,9 @@ export class Fabric {
         '/remove': (bot: any, collection: any, state: any, chat: any) => {
             return new Delete(bot, collection, state, chat);
         },
-        '/change': (bot: any, collection: any, state: any, chat: any) => {
-            return new Change(bot, collection, state, chat);
-        }
+        // '/change': (bot: any, collection: any, state: any, chat: any) => {
+        //     return new Change(bot, collection, state, chat);
+        // }
     }
 
     public constructor(private bot: any, private collection: any, private state: any, private chat: any) {
@@ -39,7 +39,12 @@ export class Fabric {
             this.chat = chat
 
             
-            if(!this.arr_command[bot_command]) throw Error('Command not found//');
+            if(!this.arr_command[bot_command]) {
+                this.bot.sendMessage(this.chat.chat.id, bot_answer.command_not_available_md, {
+                    parse_mode: "Markdown"
+                })
+                return
+            }
 
             return this.arr_command[bot_command](
                 this.bot, 
