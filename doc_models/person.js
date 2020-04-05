@@ -28,5 +28,6 @@ module.exports = {
         "available": Boolean(false),
         "days_vacation": null,
         "date_of_vacation": null
-    } 
+    },
+    "is_absent": false
 }
