@@ -10,6 +10,7 @@ export class Info extends Command {
 
     /**
      * Формирует объект с количеством сотрудников на смене
+     * отправляет инлайн-клаввиатуру в чат с количеством сотрудников 
      *  
      */
     private getInfoObject() : void {
@@ -17,40 +18,45 @@ export class Info extends Command {
             this.collection.find().toArray((err: any, data: any)=> {
                 if(data.lenght === 0) throw Error('Was returned empty array')
 
-                const arrAvailable: Array<string> = ['auto', 'child', 'is_ill', 'is_vacation']
-                let object: any = {
-                    "мастер": [],
-                    "аппаратчик": [],
-                    "гранулировщик": [],
-                    "онфл": [],
-                    "обработчик": [],
-                    "фасовщик": [],
-                    "технолог": [],
-                    "уборщик": [],
-                    "обработчик/тары": []
-                }
-                data.forEach((value: any) => {
-                    if(value.position in object) {
-                        if(value[arrAvailable[0]].available || 
-                            value[arrAvailable[1]].available ||
-                            value[arrAvailable[2]].available ||
-                            value[arrAvailable[3]].available) {
-                            return
-                        }
-                        object[value.position].push(value);
+                let arrayPosition: Array<string> = [
+                    "мастер", "аппаратчик", "гранулировщик", "онфл", "обработчик", "фасовщик", "технолог", "уборщик", "обработчик/тары"
+                ]
+
+                this.collection.countDocuments({"shift": "2", "is_absent": false}).then( (data: any ) => { // всего присутствует 
+                    this.collection.countDocuments({"shift": "2", "is_absent": true}).then( (data_not: any ) => { // всего отсутствует
+                        this.sendMessage(`Всего на смене = ${data}. Отсутствует = ${data_not}`)
+                    })
+                }).then(
+                    ()=> {
+                        arrayPosition.forEach((element: string) => {
+
+                            this.collection.countDocuments({"position": String(element), "is_absent": false}).then( (absent: any) =>  { // на смене 
+                                this.collection.countDocuments({"position": String(element), "is_absent": true}).then( (not_absent: any) => { // отсутствуют
+                                    const text: string = `на смене - ${absent}. Отсутствует -${not_absent}`; // построение строки клавиатуры 
+                                    const markup_keyboard: any = {
+                                        parse_mode: `Markdown`,
+                                        reply_markup: {
+                                            inline_keyboard: [
+                                                [
+                                                    {
+                                                        text: text,
+                                                        callback_data: String(['position-show', element])
+                                                    }
+                                                ]
+                                            ]
+                                        }
+                                    }
+                                    this.sendMessage(element, markup_keyboard);
+                                })
+                            }) 
+                        });
                     }
-                })
-                let counter = 0
-                for(let value in object) {
-                    object[value] = object[value].length;
-                    counter += object[value];
-                }
-                object["итого"] = counter;
-                
-                this.sendMessage(JSON.stringify(object, null, 2))               
+                )          
             })
+            
         } catch (err) {
             console.log(err) 
         }
     }
+
 }
