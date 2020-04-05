@@ -17,11 +17,15 @@ export class CallbackAllow extends Main {
      private insertToBaseAllow() : void {
         try{
             this.state.findOneAndDelete({_id: this.ObjectId(this.callback_array[1])}).then((data: any) => {
-                console.log(data)
                 this.state.findOneAndDelete({id: this.callback_array[1]});
-                this.collection.insertOne(data.value).then(() => {
-                    this.sendMessage('Сотрудник успешно добавлен в базу данных');
-                    console.log('Карточка создана, сотрудник добавлен, стейт-база очищена')
+                console.log(data)
+                this.collection.updateOne(
+                    {_id: this.ObjectId(data.value._id)}, 
+                    {$set: data.value }, 
+                    {upsert: true})
+                        .then(() => {
+                        this.sendMessage('Данные сотрудников обновлены');
+                        console.log('Карточка создана, сотрудник добавлен, стейт-база очищена')
                 })
             })
             
