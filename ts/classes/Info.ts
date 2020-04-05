@@ -10,7 +10,7 @@ export class Info extends Command {
 
     /**
      * Формирует объект с количеством сотрудников на смене
-     * отправляет инлайн-клаввиатуру в чат с количеством сотрудников 
+     * отправляет инлайн-клавиатуру в чат с количеством сотрудников 
      *  
      */
     private getInfoObject() : void {
@@ -20,19 +20,19 @@ export class Info extends Command {
 
                 let arrayPosition: Array<string> = [
                     "мастер", "аппаратчик", "гранулировщик", "онфл", "обработчик", "фасовщик", "технолог", "уборщик", "обработчик/тары"
-                ]
+                ];
 
-                this.collection.countDocuments({"shift": "2", "is_absent": false}).then( (data: any ) => { // всего присутствует 
-                    this.collection.countDocuments({"shift": "2", "is_absent": true}).then( (data_not: any ) => { // всего отсутствует
+                this.collection.countDocuments({"shift": "2", "is_absent": "нет"}).then( (data: any ) => { // всего присутствует 
+                    this.collection.countDocuments({"shift": "2", "is_absent": "да"}).then( (data_not: any ) => { // всего отсутствует
                         this.sendMessage(`Всего на смене = ${data}. Отсутствует = ${data_not}`)
                     })
                 }).then(
                     ()=> {
                         arrayPosition.forEach((element: string) => {
 
-                            this.collection.countDocuments({"position": String(element), "is_absent": false}).then( (absent: any) =>  { // на смене 
-                                this.collection.countDocuments({"position": String(element), "is_absent": true}).then( (not_absent: any) => { // отсутствуют
-                                    const text: string = `на смене - ${absent}. Отсутствует -${not_absent}`; // построение строки клавиатуры 
+                            this.collection.countDocuments({"position": String(element), "is_absent": "нет"}).then( (absent: any) =>  { // на смене 
+                                this.collection.countDocuments({"position": String(element), "is_absent": "да"}).then( (not_absent: any) => { // отсутствуют
+                                    const text: string = `На смене - ${absent}. Отсутствует - ${not_absent}`; // построение строки клавиатуры 
                                     const markup_keyboard: any = {
                                         parse_mode: `Markdown`,
                                         reply_markup: {
@@ -53,10 +53,17 @@ export class Info extends Command {
                     }
                 )          
             })
+
             
         } catch (err) {
             console.log(err) 
         }
+    }
+
+    private toUpper( word : string ) {
+        if (!word) return word;
+
+        return word[0].toUpperCase() + word.slice(1);
     }
 
 }
