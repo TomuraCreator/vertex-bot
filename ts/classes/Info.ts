@@ -32,16 +32,21 @@ export class Info extends Command {
 
                             this.collection.countDocuments({"position": String(element), "is_absent": "нет"}).then( (absent: any) =>  { // на смене 
                                 this.collection.countDocuments({"position": String(element), "is_absent": "да"}).then( (not_absent: any) => { // отсутствуют
-                                    const text: string = `На смене - ${absent}. Отсутствует - ${not_absent}`; // построение строки клавиатуры 
+                                    const textOn: string = `На смене - ${absent}` 
+                                    const textOff: string = `Отсутствует - ${not_absent}`; // построение строки клавиатуры 
                                     const markup_keyboard: any = {
                                         parse_mode: `Markdown`,
                                         reply_markup: {
                                             inline_keyboard: [
                                                 [
-                                                    {
-                                                        text: text,
-                                                        callback_data: String(['position-show', element])
-                                                    }
+                                                        {
+                                                            text: textOn,
+                                                            callback_data: String(['position-show', element, 'нет'])
+                                                        },
+                                                        {
+                                                            text: textOff,
+                                                            callback_data: String(['position-show', element, 'да'])
+                                                        }
                                                 ]
                                             ]
                                         }
