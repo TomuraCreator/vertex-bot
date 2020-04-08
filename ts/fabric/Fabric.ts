@@ -3,6 +3,8 @@ import { Help } from '../classes/Help'
 import { Find } from '../classes/Find'
 import { Add } from '../classes/Add'
 import { Delete } from '../classes/Delete'
+import { Start } from '../classes/Start'
+
 // import { Change } from '../classes/Change'
 
 const PATH = process.env.PWD;
@@ -28,7 +30,10 @@ export class Fabric {
         },
         // '/change': (bot: any, collection: any, state: any, chat: any) => {
         //     return new Change(bot, collection, state, chat);
-        // }
+        // },
+        '/start': (bot: any, collection: any, state: any, chat: any) => {
+            return new Start(bot, collection, state, chat);
+        }
     }
 
     public constructor(private bot: any, private collection: any, private state: any, private chat: any) {
