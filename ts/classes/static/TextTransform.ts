@@ -3,45 +3,46 @@
  */
 
 export class TextTransform {
-
+    static type: string = "TextTransform"
     static keys = require(process.env.PWD + '/doc_models/translate_key');
     static person_pattern = require(process.env.PWD + '/doc_models/person');
 
-    static available = ["child", "is_ill", "is_vacation", "auto"];
+    static available = ["child", "is_ill", "is_vacation", "auto"]; // имена свойств с вложением
 
     /**
-     * Переводит поля объекта на русский
-     * @param {object} json
-     * @param {string}  substring
+     * Переводит поля объекта на русский и возвращает строку для вывода в чат 
+     * 
+     * @param {object} json // объект для раскодирования свойств на русский язык
+     * @param {string}  substring // строка для вывода в чат после формирования строки
      * @return {string} 
      */
     static translateFieldstoRus( 
         json: any, 
         substring = 'Подтвердите правильность введённых данных' 
         ) : string {
-        
+        const keys_toEng: any = TextTransform.keys.to_eng; // шаблоны для перевода на русский по ключам на англ
         let str = `*${substring}* \n`;
 
-            for(let value in json ) {
-                if(TextTransform.keys.to_eng[value]) {
-                    str += `_${TextTransform.keys.to_eng[value]}_ : ${(!TextTransform.available.includes(value)) ? json[value] : ''} \n`
+				for(let value in json ) { // value поля карточки на англ
+                if(keys_toEng[value]) { 
+                    str += `_${keys_toEng[value]}_ : ${
+                        (!TextTransform.available.includes(value)) ? json[value] : ''
+                    } \n`
                     
-                    if(TextTransform.available.includes(value)) {
+					if(TextTransform.available.includes(value)) { // если поле состоит в списке полей имеющих вложения  
                         let substring_available = '';
                         for(let deep_value in json[value]) {
                             if(deep_value === 'available') continue;
-
                             substring_available += `_\t\t\t\t\t\t\t\t${
-                                TextTransform.keys.
-                                to_eng[deep_value]
+                                keys_toEng[deep_value]
                             }_ : ${json[value][deep_value]} \n`
                         }
                         str += substring_available;
                     }
                 } else {
                     
-                    if(json[value] === TextTransform.keys.to_eng) {
-                        str += `_${TextTransform.keys.to_eng[value]}_ : ${
+                    if(json[value] === keys_toEng) {
+                        str += `_${keys_toEng[value]}_ : ${
                             (typeof json[value] == "object"
                             || json[value] === null)
                                 ? "нет" 
@@ -55,34 +56,57 @@ export class TextTransform {
     }
 
     /**
-     * переводит запрос на русском в запрос на английском
-     * и возвращает объект c параметрами запроса к базе
+     * переводит данные запроса из телеграмм на русском в объект запроса к БД на английском
      * @static
-     * @param {string || array} строка из телеграма 
-     * @return {object} параметры запроса
-     * @memberof TextTransform
+     * @param {array} массив с запросом 
+     * @return {object} возвращает объект запроса
+     * @memberof TextTransform 
      */
 
     static getTranslateKey( key: any ) : any {
-        if (!key) return false;
-        if (typeof key === 'string' ) { // если строка преобразовать в массив 
-            key = key.split(" ");
+        try {
+            if (!key || key.length === 1) return false;
+            const translate_obj = TextTransform.keys.to_rus; // объект с данными для перевода полей запроса
+            // const replace_obj: any = {};
+            const array_map = key.slice(1).map((element: any) => { // данные запроса переводит в вид [['', '', ''], ['', '']]
+                return element.trim().split('-');                   // исключая элемент команды 
+            }) 
+
+            let result: any = {}
+            array_map.forEach((element: any) => { // обходит многомерный массив запроса если есть вложение оборачивает в мап
+                    if(element[0] in translate_obj) {
+                        let key = translate_obj[element[0]]
+                        let propertyIn: string = translate_obj[element[1]]
+                        
+                        if(element.length === 3 && element[1] in translate_obj) {   // если есть вложенный объект
+                            if(key in result) { // если свойство добавлено
+                                let obj: any = {}
+                                obj[propertyIn] = element[2]
+                                let copy = Object.assign(result[key], obj)
+                                result[key] = copy
+                            } else { // если свойства нет 
+                                let obj: any = {}
+                                obj[propertyIn] = element[2]
+                                result[key] = obj
+                            }
+                        } else { // если прямое присвоение в свойство
+                            result[key] = element[1]
+                        }
+                    }
+                })
+                return result
+        } catch(e) {
+            console.log({
+                'ErrorName': e.name,
+                'ErrorDirection':  TextTransform.type,
+                'ErrorMessage': e.message
+            })
         }
-        const replace_obj: any = {};
-        
-        key.forEach((substring: any) => {
-            if(substring.indexOf("-") !== -1) {
-                const arr_str = substring.trim().split('-');
-                if(arr_str[0] in TextTransform.keys.to_rus) {
-                    replace_obj[TextTransform.keys.to_rus[arr_str[0]]] = arr_str[1];
-                }   
-            }
-        })
-        return replace_obj
     }
 
     /**
-     * Перевод полей на русский 
+     * переводит данные из базы на английском в информацию на 
+     * и возвращает объект c параметрами запроса к базе 
      * @param matches 
      */
     static translateFieldstoEng( matches: any) :any{
@@ -103,24 +127,35 @@ export class TextTransform {
     }
 
     /**
-     *Заменяет поля в объекте на "object" на поля в объекте "obj_fields"
-     * @param {*} object 
-     * @param {*} obj_fields 
+     *Заменяет поля в объекте "object" на поля в объекте "obj_fields"
+     * для отправки изменений свойств объекта в БД после внесения пользователем
+     * @param {*} object объект-карточка пользователя в котором планируется замена свойств
+     * @param {*} obj_fields свойства для замены 
+     * @return 
      */
     static getReplaseFields( object: any, obj_fields: any ) {
-        
+        const available: Array<string> = TextTransform.available;
         try {
             if(object && obj_fields) {
                 let replaces = Object.assign({}, object);
                 for(let value in obj_fields) {
-                    replaces[value] = obj_fields[value];  
+                    if(available.includes(value)) {
+                        replaces[value] = Object.assign(replaces[value], obj_fields[value]) // 
+                        continue
+                    } else {
+                        replaces[value] = obj_fields[value];
+                    } 
                 }
                 return replaces;
             } else {
                 return false
             }
         } catch(e) {
-            console.log(e)
+            console.log({
+                'ErrorName': e.name,
+                'ErrorDirection':  TextTransform.type,
+                'ErrorMessage': e.message
+            })
         }   
     }
 }
