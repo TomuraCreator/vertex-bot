@@ -65,13 +65,14 @@ export class TextTransform {
 
     static getTranslateKey( key: any ) : any {
         try {
-            if (!key || key.length === 1) return false;
+            if (!key || key.length === 1) throw new Error(`Key is not defined`);
             const translate_obj = TextTransform.keys.to_rus; // объект с данными для перевода полей запроса
-            // const replace_obj: any = {};
             const array_map = key.slice(1).map((element: any) => { // данные запроса переводит в вид [['', '', ''], ['', '']]
                 return element.trim().split('-');                   // исключая элемент команды 
-            }) 
+            })
+            const paramDelimeter = array_map.find((element: Array<string>) => element[0].includes(':'))
 
+            
             let result: any = {}
             array_map.forEach((element: any) => { // обходит многомерный массив запроса если есть вложение оборачивает в мап
                     if(element[0] in translate_obj) {
@@ -79,13 +80,18 @@ export class TextTransform {
                         let propertyIn: string = translate_obj[element[1]]
                         
                         if(element.length === 3 && element[1] in translate_obj) {   // если есть вложенный объект
+
                             if(key in result) { // если свойство добавлено
-                                let obj: any = {}
+                                let obj: any = {
+                                    available: true
+                                }
                                 obj[propertyIn] = element[2]
                                 let copy = Object.assign(result[key], obj)
                                 result[key] = copy
                             } else { // если свойства нет 
-                                let obj: any = {}
+                                let obj: any = {
+                                    available: true
+                                }
                                 obj[propertyIn] = element[2]
                                 result[key] = obj
                             }
@@ -94,11 +100,17 @@ export class TextTransform {
                         }
                     }
                 })
+                if(paramDelimeter && !isNaN(Number(key[0]))) { // если есть строка-параметр делим её и добавляем свойство с 
+                    // данными для обработки 
+                    const valueParam = paramDelimeter[0].trim().split(':')
+                    result.params = [translate_obj[valueParam[0]], valueParam[1]];
+                }
                 return result
+                
         } catch(e) {
             console.log({
                 'ErrorName': e.name,
-                'ErrorDirection':  TextTransform.type,
+                'ErrorDirection':  [TextTransform.type, this],
                 'ErrorMessage': e.message
             })
         }
@@ -133,27 +145,36 @@ export class TextTransform {
      * @param {*} obj_fields свойства для замены 
      * @return 
      */
-    static getReplaseFields( object: any, obj_fields: any ) {
+    static getReplaseFields( object: any, obj_fields: any, param?: any ) {
         const available: Array<string> = TextTransform.available;
         try {
+
             if(object && obj_fields) {
                 let replaces = Object.assign({}, object);
-                for(let value in obj_fields) {
-                    if(available.includes(value)) {
-                        replaces[value] = Object.assign(replaces[value], obj_fields[value]) // 
-                        continue
-                    } else {
-                        replaces[value] = obj_fields[value];
-                    } 
+                if(param) {
+                    
+                    replaces[param[0]] = Object.assign(
+                        object[param[0]],
+                        obj_fields
+                        )
+                } else {
+                    for(let value in obj_fields) {
+                        if(available.includes(value)) {
+                            replaces[value] = Object.assign(replaces[value], obj_fields[value]) // 
+                            continue
+                        } else {
+                            replaces[value] = obj_fields[value];
+                        } 
+                    }
                 }
-                return replaces;
+              return replaces;
             } else {
-                return false
+                throw new Error(`Parameters is empty`)
             }
         } catch(e) {
             console.log({
                 'ErrorName': e.name,
-                'ErrorDirection':  TextTransform.type,
+                'ErrorDirection':  [TextTransform.type, 'getReplaseFields'],
                 'ErrorMessage': e.message
             })
         }   

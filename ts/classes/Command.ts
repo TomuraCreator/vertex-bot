@@ -23,7 +23,7 @@ export class Command {
         this.state = state;
         this.chat = chat;
 
-        this.match_list = Text.getTranslateKey(this.getArray( this.chat.text));
+		this.match_list = Text.getTranslateKey(this.getArray( this.chat.text)) || {};
     }
 
     /**

@@ -15,7 +15,7 @@ export class CallbackAllow extends Main {
      */
 
      private insertToBaseAllow() : void {
-        try{
+        try {
             this.state.findOneAndDelete({_id: this.ObjectId(this.callback_array[1])}).then((data: any) => {
                 this.state.findOneAndDelete({id: this.callback_array[1]});
                 console.log(data)
@@ -24,7 +24,7 @@ export class CallbackAllow extends Main {
                     {$set: data.value }, 
                     {upsert: true})
                         .then(() => {
-                        this.sendMessage('Данные сотрудников обновлены');
+                        this.sendMessage('Данные обновлены');
                         console.log('Карточка создана, сотрудник добавлен, стейт-база очищена')
                 })
             })

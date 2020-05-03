@@ -48,7 +48,7 @@ export class CallbackDenied extends Main {
         console.log(this.callback_array[1])
         try {
             this.state.findOneAndDelete({id: this.callback_array[1]}).then( () => {
-                this.sendMessage('_Данные сотрундинка очищены_', 'md')
+                this.sendMessage('_Данные очищены_', 'md')
             })
         } catch(e) {
             console.log(e)

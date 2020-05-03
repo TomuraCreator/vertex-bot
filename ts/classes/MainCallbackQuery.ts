@@ -1,5 +1,3 @@
-import {TextTransform as Text} from './static/TextTransform';
-
 export class MainCallbackQuery {
     protected ObjectId: any = require("mongodb").ObjectID;
     readonly type: string = 'main';

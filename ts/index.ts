@@ -1,16 +1,12 @@
 import { Fabric } from './fabric/Fabric'
 import {DateSchedule as Schedule} from './schedule/Schedule'
 import {CallbackQueryFabric as Callback} from './fabric/CallbackQueryFabric'; 
-import { match } from 'assert';
 
 require('dotenv').config();
+require('../config/express')
 
-// const CommandRoute = require('./class/CommandRoute');
 const TelegramBot = require('node-telegram-bot-api');
-// const bot_answer = require('./doc_models/bot_answer');
-// const TextTransform = require('./class/TextTransform');
 
-const express = require('../config/express')
 const ObjectId = require("mongodb").ObjectID;
 
 const MongoClient = require("mongodb").MongoClient;
@@ -53,7 +49,7 @@ mongo.connect(function( err: string, client: any ) {
         
         if(!params.entities) return
         try {
-            const command: any = new Fabric(bot, collection, state_collection, params);
+            new Fabric(bot, collection, state_collection, params);
         } catch(e) {
             console.log(e)
         }  
