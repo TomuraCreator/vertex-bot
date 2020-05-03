@@ -4,7 +4,9 @@
   "description": "telegram bot for checking homeworks",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon ./dist/index.js",
+    "start": "node dist/index.js",
+    "runs": "nodemon ./dist/index.js",
+    "build": "tsc",
     "watch": "tsc --watch"
   },
   "author": "Tomura_Creator",

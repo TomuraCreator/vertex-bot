@@ -20,7 +20,7 @@ export class CallbackPositionShow extends Main {
      *  Возвращает объект поиска по должности 
      */
     private getPositionList() : any {
-        return this.collection.find({position: this.callback_array[1]})
+        return this.collection.find({position: this.callback_array[1], is_absent: this.callback_array[2]})
     }
 
     private parseRequestPosition( array: any, parse = 'Markdown' ) : any {

@@ -44,7 +44,14 @@ mongo.connect(function( err: string, client: any ) {
         {minute: 1, second: 1, hour: 8},
         {minute: 1, second: 1, hour: 20}
     ])
-
+    bot.onText(/^(\d+)/g, (match: any, msg: any) => { // обработчик изменения карточки 
+        try{
+            const callback: any  = new Callback(bot, collection, state_collection, match)
+            return
+        } catch(e) {
+            console.log(e)
+        }
+    })
     bot.on('message', (params: any) => {
         
         if(!params.entities) return
@@ -53,7 +60,6 @@ mongo.connect(function( err: string, client: any ) {
         } catch(e) {
             console.log(e)
         }  
-        
     })
 
     bot.on('callback_query', (match: any ) => {
@@ -62,17 +68,5 @@ mongo.connect(function( err: string, client: any ) {
         } catch(e) {
             console.log(e)
         }  
-    })
-
-    bot.onText(/^(\d+)/g, (match: any, msg: any) => { // обработчик изменения карточки 
-        try{
-            const callback: any  = new Callback(bot, collection, state_collection, match)
-        } catch(e) {
-            console.log(e)
-        }
-        
-
-    })
-
-    
+    })    
 })
