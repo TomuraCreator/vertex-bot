@@ -4,3 +4,4 @@ npm-debug.*
 tsconfig.tsbuildinfo
 state/
 dist/
+.vscode/
