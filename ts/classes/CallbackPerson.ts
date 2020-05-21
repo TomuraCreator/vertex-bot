@@ -1,6 +1,13 @@
 import {MainCallbackQuery as Main} from './MainCallbackQuery';
 import {TextTransform as Text} from './static/TextTransform';
 
+/**
+ * @class
+ * При нажатии на кнопку инлайн клавиатуры показывает карточку сотрудника
+ * @constructor bot: any - объект бота, state: any - объект временной коллекции, 
+ * collection: any - объект основной коллекции, chat: any - объект текущего чата
+ * @extends MainCallbackQuery
+ */
 
 export class CallbackPerson extends Main {
     readonly type: string = 'person';
@@ -13,7 +20,6 @@ export class CallbackPerson extends Main {
 
     private getPreviewPerson() : void {
         try {
-
             this.collection.find({ _id: this.ObjectId(
                     this.callback_array[1])})
                     .toArray((err: string, result: any) => {

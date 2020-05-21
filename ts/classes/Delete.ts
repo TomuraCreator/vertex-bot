@@ -1,6 +1,15 @@
 import {Command} from './Command';
 import {TextTransform as Text} from './static/TextTransform';
 
+/**
+ * @class
+ * Отклик на команду /delete.
+ * Производит удаление из базы по данным от пользователя 
+ * @extends Command
+ * @constructor bot: any - объект бота, state: any - объект временной коллекции, 
+ * collection: any - объект основной коллекции, chat: any - объект текущего чата
+ */
+
 export class Delete extends Command {
     readonly type: string = 'delete'
 

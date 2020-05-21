@@ -22,7 +22,7 @@ module.exports = {
         "начало": "date_ill_start",
         "конец": "date_ill_end",
         "дни": "days_vacation",
-        "c": "date_of_vacation",
+        "от": "date_of_vacation",
         "отсутствует": "is_absent"
 
     },
@@ -48,7 +48,7 @@ module.exports = {
         "date_ill_start": "начало",
         "date_ill_end": "конец",
         "days_vacation": "дни",
-        "date_of_vacation": "c",
+        "date_of_vacation": "от",
         "is_absent": "отсутствует"
     }
 }

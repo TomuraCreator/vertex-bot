@@ -1,6 +1,9 @@
 import {TextTransform as Text} from './static/TextTransform';
 /**
- * Класс для описания наследования классов команд
+ * @class
+ * Суперкласс для наследования команд
+ * @constructor bot: any - объект бота, state: any - объект временной коллекции, 
+ * collection: any - объект основной коллекции, chat: any - объект текущего чата
  */
 export class Command {
 
@@ -27,7 +30,7 @@ export class Command {
     }
 
     /**
-     * 
+     * отправляет сообщение в чат 
      * @param message 
      * @param {String} mode Markdown (md)
      * @return void

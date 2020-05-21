@@ -46,7 +46,7 @@ export class DateSchedule  {
 
         shedule.scheduleJob(param_obj, (data: any) => {
             const date = new Date();
-            const reg = new RegExp(`^${date.getMonth()+1}\/${date.getDate()}`)
+            const reg = new RegExp(`^${date.getMonth()+1}\/${date.getDate()}`); 
 
             this.collection.find({date_of_birth: reg}).toArray((err: string, data: any) => {
                 if(!data[0]) {
@@ -58,4 +58,13 @@ export class DateSchedule  {
             })
         })
     }
+
+    /**
+     * Проверяет каждый день на наличие долго отсутствующих сотрудников 
+     * если > 7 суток ? оповещение : отключить уведомления для сотрудника
+     * 
+     */
+
+
+
  }

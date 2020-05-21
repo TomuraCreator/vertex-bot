@@ -1,20 +1,30 @@
 import {MainCallbackQuery as Main} from './MainCallbackQuery';
 
-
+/**
+ * @class
+ * Отклик по нажатию на кнопку после результа вывода /info
+ * При нажатии на кнопку инлайн клавиатуры показывает список подсчитанных сотрудников
+ * @constructor bot: any - объект бота, state: any - объект временной коллекции, 
+ * collection: any - объект основной коллекции, chat: any - объект текущего чата 
+ * @extends MainCallbackQuery
+ */
 export class CallbackPositionShow extends Main {
     readonly type: string = 'position-show';
 
     public constructor(bot: any, state: any, collection: any, chat: any) {
         super(bot, state, collection, chat)
         this.showPositionList();
+        console.log(this.type)
     }
 
+    /**
+     * Выводит список сотрудников в чат в виде инлайн клавиатуры
+     */
     private showPositionList() : void {
         this.getPositionList().toArray((err: string, element: any) => {
             this.sendMessage(`**${this.callback_array[1]}**`, this.parseRequestPosition(element));
         })
     }
-
 
     /**
      *  Возвращает объект поиска по должности 
@@ -23,6 +33,11 @@ export class CallbackPositionShow extends Main {
         return this.collection.find({position: this.callback_array[1], is_absent: this.callback_array[2]})
     }
 
+    /**
+     * Формирует инлайн клавиатуру на основе данных из бд
+     * @param {Array} array массив параметров
+     * @param {String} parse тип форматирования
+     */
     private parseRequestPosition( array: any, parse = 'Markdown' ) : any {
         array.sort(( a: any, b:any )=> {
             if (a.surname < b.surname) return -1

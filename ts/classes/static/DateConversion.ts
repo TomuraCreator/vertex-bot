@@ -1,7 +1,10 @@
 /**
+ * @static
  *  преобразует дату из строки формата хх.хх.хххх 
  *  в timestamp и обратно
- *  
+ * @method conversionToString переводит timestamp представление даты в строковое 
+ * @method conversionToTimestamp переводит строковое представление даты в timestamp
+ * @method validateDate валидирует дату
  */ 
 export class DateConversion {
     private static type: string = DateConversion.getName(); 
@@ -50,14 +53,16 @@ export class DateConversion {
     }
 
     /**
+     * @static
      * валидирует дату 
      * @param {String} date строка даты 
      * @returns {Boolean}
+     * @memberof DateConversion
      */
-    private static validateDate( date: string) : Boolean | any {
+    public static validateDate( date: string) : Boolean | any {
         const regexp = new RegExp(/^\d{2}.\d{2}.\d{4}/)
-        if(!isNaN(Number(date))) throw TypeError(`Invalid parameter data type: ${typeof date}`);
-        if(!regexp.test(date)) throw Error(`The parameter doesn't match the format xx.xx.xxxx`);
+        if(!isNaN(Number(date))) throw TypeError(`Параметр даты имеет тип данных: ${typeof date}, ожидается string`);
+        if(!regexp.test(date)) throw TypeError(`Параметр даты не соответствует формату дд.мм.гггг`);
 
         // валидация чисел строки даты от пользователя 
         let mapValidate: Boolean = date.split('.') // ['xx', 'xx', 'xxxx']
@@ -79,8 +84,8 @@ export class DateConversion {
                 return false
                 
             })
-        if(mapValidate) return true;
-        return false 
+        if(mapValidate) return date;
+        throw TypeError('Числа даты больше или меньше реальных чисел. ');
     } 
 
 

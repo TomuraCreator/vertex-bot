@@ -1,7 +1,11 @@
 import {Command} from './Command';
 import {TextTransform as Text} from './static/TextTransform';
 /**
+ * @class
+ * 
  * Класс для обработки команды /change
+ * @constructor bot: any - объект бота, state: any - объект временной коллекции, 
+ * collection: any - объект основной коллекции, chat: any - объект текущего чата
  */
 export class Change extends Command {
     readonly type: string = 'change'

@@ -1,3 +1,9 @@
+/**
+ * @class
+ * суперкласс для наследования на отклик от инлайн клавиатуры
+ * @constructor bot: any - объект бота, state: any - объект временной коллекции, 
+ * collection: any - объект основной коллекции, chat: any - объект текущего чата 
+ */
 export class MainCallbackQuery {
     protected ObjectId: any = require("mongodb").ObjectID;
     readonly type: string = 'main';
@@ -16,6 +22,7 @@ export class MainCallbackQuery {
     }
 
     /**
+     * выводит сообщение в чат
      * @param message 
      * @param {String} mode Markdown (md)
      * @return void

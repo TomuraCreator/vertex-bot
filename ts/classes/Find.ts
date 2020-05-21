@@ -1,5 +1,13 @@
 import {Command} from './Command';
 
+/**
+ * @class
+ * Отклик на команду /find
+ * выводит инлайн клавиатуру с найденными сотрудниками
+ * @extends Command
+ * @constructor bot: any - объект бота, state: any - объект временной коллекции, 
+ * collection: any - объект основной коллекции, chat: any - объект текущего чата
+ */
 export class Find extends Command {
     readonly type: string = 'find'
 

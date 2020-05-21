@@ -2,8 +2,17 @@ const bot_answer: any = require(process.env.PWD + '/doc_models/bot_answer.js')
 const person: any = require(process.env.PWD + '/doc_models/person.js')
 
 import {TextTransform as Text} from './static/TextTransform';
-
 import {MainCallbackQuery as Main} from './MainCallbackQuery';
+import {totalValidate} from './static/totalValidate';
+
+/**
+ * @class
+ * Отклик на инлайн кнопку "изменить"
+ * Меняет данные в базе на пользовательские по запросу
+ * @constructor bot: any - объект бота, state: any - объект временной коллекции, 
+ * collection: any - объект основной коллекции, chat: any - объект текущего чата
+ * @extends MainCallbackQuery
+ */
 
 export class CallbackSetChanges extends Main {
     readonly type: string = 'CallbackSetChanges';
@@ -18,6 +27,15 @@ export class CallbackSetChanges extends Main {
         try {
             const array = this.chat.text.split(' ');
             const text_replace = Text.getTranslateKey(array);
+            try {
+                totalValidate(text_replace);
+            } catch(e) {
+                this.sendMessage(e.message);
+                throw {
+                    name: e.name,
+                    message: e.message
+                }
+            }
             const number = array[0]
             this.state.findOne({message_id: Number(number)}).then( (result: any) => {
                 if(!result) {

@@ -1,5 +1,14 @@
 import { Command } from './Command'
 
+/**
+ * @class
+ * Отклик на команду /info.
+ * Подсчитывает и выводит количество сотрудников в виде списка кнопок
+ * @extends Command
+ * @constructor bot: any - объект бота, state: any - объект временной коллекции, 
+ * collection: any - объект основной коллекции, chat: any - объект текущего чата
+ */
+
 export class Info extends Command {
     readonly type: string = 'info';
     public constructor(bot: any, state: any, collection: any, chat:any) {
