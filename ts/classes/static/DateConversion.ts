@@ -75,20 +75,70 @@ export class DateConversion {
                     if(element >= 1920 && element <= year + 1) {
                         return true;
                     } 
-                } else {
-                    // 1 <= day | month <= 12
+                } else if( index === 1 ) {
+                    // 1 <= month <= 12
                     if(element <= 12 && element >= 1) { 
                         return true 
                     } 
+                } else if( index === 0 ) {
+                    if(element <= 31 && element >= 1) { 
+                        return true 
+                    }
                 }
                 return false
-                
             })
         if(mapValidate) return date;
         throw TypeError('Числа даты больше или меньше реальных чисел. ');
     } 
 
+    /**
+     * @static
+     * Конвертирует значения даты в объекте карточки в timestamp и обратно 
+     * @param {Object} j объект для конвертации значений 
+     * @return {Object} 
+     * @memberof DateConversion
+     */
 
+    public static invertDate( object: any) : any {
+        const toTimeStamp: any = DateConversion.conversionToTimestamp; // to timestamp
+        const toStringTime: any = DateConversion.conversionToString; // to string
+
+        const isIll: Array<string> = ['date_ill_start', 'date_ill_end'],
+            isVacation: string = 'date_of_vacation',
+            dateOfBirth: string = 'date_of_birth';
+        /**
+         * TODO переписать как дойдут руки 
+         */
+        if(object["is_ill"][isIll[0]]) {
+            if(isNaN(Number(object["is_ill"][isIll[0]]))) { // true = string
+                object["is_ill"][isIll[0]] = toTimeStamp(object["is_ill"][isIll[0]])
+            } else { // false = timestamp
+                object["is_ill"][isIll[0]] = toStringTime(object["is_ill"][isIll[0]])
+            }     
+        } 
+        if(object["is_ill"][isIll[1]]) {
+            if(isNaN(Number(object["is_ill"][isIll[1]]))) { // true = string
+                object["is_ill"][isIll[1]] = toTimeStamp(object["is_ill"][isIll[1]])
+            } else { // false = timestamp
+                object["is_ill"][isIll[1]] = toStringTime(object["is_ill"][isIll[1]])
+            }
+        } 
+        if(object["is_vacation"][isVacation]) {
+            if(isNaN(Number(object["is_vacation"][isVacation]))) { // true = string
+                object["is_vacation"][isVacation] = toTimeStamp(object["is_vacation"][isVacation])
+            } else { // false = timestamp
+                object["is_vacation"][isVacation] = toStringTime(object["is_vacation"][isVacation])
+            }
+        } 
+        if(object[dateOfBirth]) {
+            if(isNaN(Number(object[dateOfBirth]))) { // true = string
+                object[dateOfBirth] = toTimeStamp(object[dateOfBirth])
+            } else { // false = timestamp
+                object[dateOfBirth] = toStringTime(object[dateOfBirth])
+            }
+        }
+        return object;
+    }
     /**
      * возвращает имя класса 
      */

@@ -1,6 +1,6 @@
 import {MainCallbackQuery as Main} from './MainCallbackQuery';
 import {TextTransform as Text} from './static/TextTransform';
-
+import {DateConversion} from './static/DateConversion';
 /**
  * @class
  * При нажатии на кнопку инлайн клавиатуры показывает карточку сотрудника
@@ -23,7 +23,8 @@ export class CallbackPerson extends Main {
             this.collection.find({ _id: this.ObjectId(
                     this.callback_array[1])})
                     .toArray((err: string, result: any) => {
-                this.sendMessage(Text.translateFieldstoRus(result[0], ''),
+                const invert: any = DateConversion.invertDate(result[0]); // инвертируем дату во всех полях
+                this.sendMessage(Text.translateFieldstoRus(invert, ''),
                     {
                     parse_mode: 'Markdown',
                     reply_markup: {

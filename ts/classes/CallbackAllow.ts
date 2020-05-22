@@ -1,4 +1,5 @@
 import {MainCallbackQuery as Main} from './MainCallbackQuery';
+import {DateConversion} from './static/DateConversion';
 
 export class CallbackAllow extends Main {
     readonly type: string = 'yes';
@@ -18,10 +19,11 @@ export class CallbackAllow extends Main {
         try {
             this.state.findOneAndDelete({_id: this.ObjectId(this.callback_array[1])}).then((data: any) => {
                 this.state.findOneAndDelete({id: this.callback_array[1]});
-                console.log(data)
+                const invert: any = DateConversion.invertDate(data.value); // инвертируем дату 
+                console.log(invert)
                 this.collection.updateOne(
-                    {_id: this.ObjectId(data.value._id)}, 
-                    {$set: data.value }, 
+                    {_id: this.ObjectId(invert._id)}, 
+                    {$set: invert }, 
                     {upsert: true})
                         .then(() => {
                         this.sendMessage('Данные обновлены');

@@ -1,6 +1,5 @@
 const bot_answer: any = require(process.env.PWD + '/doc_models/bot_answer.js')
 import {MainCallbackQuery as Main} from './MainCallbackQuery';
-
 /**
  * Отклик на 
  */

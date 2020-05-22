@@ -4,6 +4,7 @@ const person: any = require(process.env.PWD + '/doc_models/person.js')
 import {TextTransform as Text} from './static/TextTransform';
 import {MainCallbackQuery as Main} from './MainCallbackQuery';
 import {totalValidate} from './static/totalValidate';
+import {DateConversion} from './static/DateConversion'
 
 /**
  * @class
@@ -46,10 +47,11 @@ export class CallbackSetChanges extends Main {
                     .then((data:any) => {
                         let replacees: any;
                         let translate: any;
-                        
+                        DateConversion.invertDate(data) // инвертирование даты 
                         if(text_replace.params) {
                             if(text_replace.params[1] === 'очистить') {
                                 let array_params: Array<string> = [text_replace.params[0], text_replace.params[1]]
+                                
                                 replacees = Text.getReplaseFields(data, person[text_replace.params[0]], array_params);
                                 console.log('replace', text_replace)
                                 translate = Text.translateFieldstoRus(replacees, '_Подтвердите изменение_')
