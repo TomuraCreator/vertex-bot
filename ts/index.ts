@@ -7,16 +7,10 @@ require('../config/express')
 
 const TelegramBot = require('node-telegram-bot-api');
 
-const ObjectId = require("mongodb").ObjectID;
-
 const MongoClient = require("mongodb").MongoClient;
 const fs = require('fs');
 
-type env = string | undefined;
-
-const TOKEN:env = process.env.TOKEN;
-const MONGODB_URI: env = process.env.MONGODB_URI;
-const NAME: env = process.env.NAME;
+const {TOKEN, MONGODB_URI, NAME, WEBHOOK, PORT} = process.env;
 
 const mongo = new MongoClient(MONGODB_URI, {
 	useNewUrlParser: true, 
@@ -24,11 +18,13 @@ const mongo = new MongoClient(MONGODB_URI, {
 });
 
 const bot = new TelegramBot(TOKEN, {
-	polling:{
-		autoStart: true,
-	} 
-})
+    webHook: {
+        port: PORT
+    } 
+}) 
 
+bot.setWebHook(`${WEBHOOK}/bot${TOKEN}`)
+bot.getWebHookInfo();
 mongo.connect(function( err: string, client: any ) {
     if(err) throw Error(`Something went wrong: ${err}`);
 
