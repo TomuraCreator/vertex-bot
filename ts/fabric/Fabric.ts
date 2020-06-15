@@ -5,10 +5,13 @@ import { Add } from '../classes/Add'
 import { Delete } from '../classes/Delete'
 import { Start } from '../classes/Start'
 
+// import { Change } from '../classes/Change'
+
 const PATH = process.env.PWD;
 const bot_answer = require(PATH + '/doc_models/bot_answer.js')
 
 export class Fabric {
+
     private arr_command: any = {
         '/info': (bot: any, collection: any, state: any, chat:any) => {
             return new Info(bot, collection, state, chat);
@@ -25,6 +28,9 @@ export class Fabric {
         '/remove': (bot: any, collection: any, state: any, chat: any) => {
             return new Delete(bot, collection, state, chat);
         },
+        // '/change': (bot: any, collection: any, state: any, chat: any) => {
+        //     return new Change(bot, collection, state, chat);
+        // },
         '/start': (bot: any, collection: any, state: any, chat: any) => {
             return new Start(bot, collection, state, chat);
         }
@@ -50,6 +56,6 @@ export class Fabric {
                 this.collection, 
                 this.state,
                 this.chat
-            )
+                )
     }   
 }

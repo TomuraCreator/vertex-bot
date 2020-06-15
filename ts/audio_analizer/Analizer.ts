@@ -1,0 +1,1 @@
+let index: string = '';

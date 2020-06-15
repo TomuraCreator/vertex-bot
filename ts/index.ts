@@ -10,7 +10,7 @@ const TelegramBot = require('node-telegram-bot-api');
 const MongoClient = require("mongodb").MongoClient;
 const fs = require('fs');
 
-const {TOKEN, MONGODB_URI, NAME, WEBHOOK, PORT, IAM_TOKEN, FOLDER_ID} = process.env;
+const {TOKEN, MONGODB_URI, NAME, WEBHOOK, PORT} = process.env;
 
 const mongo = new MongoClient(MONGODB_URI, {
 	useNewUrlParser: true, 
@@ -25,7 +25,6 @@ const bot = new TelegramBot(TOKEN, {
 
 bot.setWebHook(`${WEBHOOK}/bot${TOKEN}`)
 bot.getWebHookInfo();
-
 mongo.connect(function( err: string, client: any ) {
     if(err) throw Error(`Something went wrong: ${err}`);
 
@@ -46,10 +45,7 @@ mongo.connect(function( err: string, client: any ) {
             const callback: any  = new Callback(bot, collection, state_collection, match)
             return
         } catch(e) {
-            console.log({
-                'ErrorName': e.name,
-                'ErrorMessage': e.message
-            })
+            console.log(e)
         }
     })
     bot.on('message', (params: any) => {
@@ -58,10 +54,7 @@ mongo.connect(function( err: string, client: any ) {
         try {
             new Fabric(bot, collection, state_collection, params);
         } catch(e) {
-            console.log({
-                'ErrorName': e.name,
-                'ErrorMessage': e.message
-            })
+            console.log(e)
         }  
     })
 
@@ -69,81 +62,7 @@ mongo.connect(function( err: string, client: any ) {
         try {
             const callback: any  = new Callback(bot, collection, state_collection, match)
         } catch(e) {
-            console.log({
-                'ErrorName': e.name,
-                'ErrorMessage': e.message
-            })
+            console.log(e)
         }  
-    }) 
-    
-    
-    const fs = require('fs');
-    const path = require('path')
-
-    const fetch = require('node-fetch');
-    const api_key = IAM_TOKEN;
-
-    const { URLSearchParams } = require('url');
-
-    const params = new URLSearchParams();
-
-
-    
-
-
-    bot.on('voice', async (msg: any, match: any) => {
-        const filePath: string = path.join(process.env.PWD, 'audioVoice')
-        const file: any = await bot.downloadFile(msg.voice.file_id, filePath, {
-            mime_type: 'audio/ogg'
-        });
-        params.append('topic', 'general');
-        params.append('folderId', FOLDER_ID)
-        // params.append('profanityFilter', true);
-        params.append('lang', 'ru-RU');
-        // params.append('file', file)
-        params.append('format', 'oggopus')
-
-        try {
-            const ftp = await fetch('https://stt.api.cloud.yandex.net/speech/v1/stt:recognize', {
-                method: 'POST',        
-                body: params,
-                headers: {
-                    'Authorization': `Bearer ${IAM_TOKEN}`,
-                },
-            })
-            console.log(ftp);
-        } catch(e) {
-            console.log(e);
-        }
-    })
+    })    
 })
-/*
-// const SpeechToTextV1 = require('ibm-watson/speech-to-text/v1');
-// const { IamAuthenticator } = require('ibm-watson/auth');
-
-// const speechToText = new SpeechToTextV1({
-//     authenticator: new IamAuthenticator({
-//       apikey: 'ha6gom_jxzAHgFgc3zUV_MGRhgAQFEnK5BgzIqCLYmIy',
-//     }),
-//     url: 'https://api.eu-gb.speech-to-text.watson.cloud.ibm.com/instances/1cc158d3-a8fe-460d-ab56-0aef20bfac5b',
-//   });
- // console.log(file)
-        // let params = {
-        //     objectMode: true,
-        //     contentType: 'audio/ogg',
-        //     model: 'en-US_BroadbandModel',
-        //     keywords: ['colorado', 'tornado', 'tornadoes'],
-        //     keywordsThreshold: 0.5,
-        //     maxAlternatives: 3
-        //   };
-        // const recognizeStream = speechToText.recognizeUsingWebSocket(params);
-        // fs.createReadStream(file).pipe(recognizeStream);
-        // recognizeStream.on('data', function(event: any) { onEvent('Data:', event); });
-        // recognizeStream.on('error', function(event: any) { onEvent('Error:', event); });
-        // recognizeStream.on('close', function(event: any) { onEvent('Close:', event); });
-
-        // // Display events on the console.
-        // function onEvent(name: any, event: any) {
-        //     console.log(name, JSON.stringify(event, null, 2));
-        // };
-        */
