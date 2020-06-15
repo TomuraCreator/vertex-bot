@@ -33,7 +33,10 @@ export class Change extends Command {
                 this.sendMessage('**По запросу был найден сотрудник**', translate_key);
             })
         } catch(e) {
-            console.log(e)
+            console.log({
+                'ErrorName': e.name,
+                'ErrorMessage': e.message
+            })
         }
     }
 }

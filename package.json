@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node dist/index.js",
-    "runs": "nodemon ./dist/index.js",
+    "serv": "nodemon ./dist/index.js",
     "build": "tsc",
     "watch": "tsc --watch"
   },
@@ -22,7 +22,6 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "mongodb": "^3.5.3",
-    "mongoose": "^5.9.1",
     "node-schedule": "^1.3.2",
     "node-telegram-bot-api": "^0.40.0"
   }
