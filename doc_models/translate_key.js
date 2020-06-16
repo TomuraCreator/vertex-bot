@@ -23,7 +23,8 @@ module.exports = {
         "конец": "date_ill_end",
         "дни": "days_vacation",
         "от": "date_of_vacation",
-        "отсутствует": "is_absent"
+        "отсутствует": "is_absent",
+        "ночные.смены": "workInTheNight"
 
     },
     "to_eng": {
@@ -49,7 +50,8 @@ module.exports = {
         "date_ill_end": "конец",
         "days_vacation": "дни",
         "date_of_vacation": "от",
-        "is_absent": "отсутствует"
+        "is_absent": "отсутствует",
+        "workInTheNight": "ночные.смены"
     }
 }
 

@@ -1,3 +1,15 @@
+interface dates {
+    shift: number, // смена
+    date: number, // день
+    month: number, // месяц
+    year: number, // день недели
+    tmstp: number, // timestamp даты
+    dayOfTheWeek: number, // день недели
+    timeHour: number,
+    fullYear: string,
+    isNight: boolean
+}
+
 function daysInMonth(date: any): number {
     const now = date;
     return 32 - new Date(now.getFullYear(), now.getMonth(), 32).getDate();
@@ -38,19 +50,6 @@ function getMonthListArray(startYear: number, countMonth: number): Array<any> {
     return month
 }
 
-interface dates {
-    shift: number, // смена
-    date: number, // день
-    month: number, // месяц
-    year: number, // день недели
-    tmstp: number, // timestamp даты
-    dayOfTheWeek: number, // день недели
-    timeHour: number,
-    fullYear: string,
-    isNight: boolean
-}
-
-const year: number = 365; 
 
 function getDateString(index: number, chooseYear: number, indexMonth: number) : string { // преобразует строку для Date конструктора 
     let year: number | string = chooseYear,
@@ -129,3 +128,5 @@ function getArrayShift(endOfYear: number, year: number): Array<Array<Array<numbe
 
     return arrayOfShift;
 }
+
+module.exports = getArrayShift;

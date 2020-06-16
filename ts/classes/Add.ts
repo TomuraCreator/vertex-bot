@@ -29,7 +29,8 @@ export class Add extends Command {
             this.sendMessage(e.message);
             throw {
                 name: e.name,
-                message: e.message
+                message: e.message,
+                path: `${e.fileName} ${e.lineNumber}`
             }
         }
         if(person_generate.surname 

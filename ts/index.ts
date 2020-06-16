@@ -33,8 +33,20 @@ mongo.connect(function( err: string, client: any ) {
     
 	const collection: any =  db.collection('vertex2');//основная коллекция
     const state_collection: any = db.collection('state') // коллекция для промежуточных данных
+    // const schedule_collection: any = db.collection('schedule_shift') // коллекция для промежуточных данных
     
     console.log("MongoBD has connected...");
+
+    // collection.updateMany({}, {$set: {workInTheNight: true}}, {multi: true}) // обновление всех документов
+    
+    // const shift: any = require('./shift_schedule/sheduleGenerate') // генерация графика смен
+
+    // const arraysShifts: any = shift(365, 2020);
+    // arraysShifts.forEach((element: any, index: number, arr: any) => {
+    //     for(let i = 0; i < element.length; i++) {
+    //         state_collection.insertOne(element[i])
+    //     }
+    // });
 
     const schedule = new Schedule(collection, bot);
     schedule.sheduleDateOfBirth([

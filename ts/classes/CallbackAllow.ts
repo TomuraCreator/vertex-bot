@@ -17,12 +17,13 @@ export class CallbackAllow extends Main {
 
      private insertToBaseAllow() : void {
         try {
+            console.log(this.callback_array[1])
             this.state.findOneAndDelete({_id: this.ObjectId(this.callback_array[1])}).then((data: any) => {
                 this.state.findOneAndDelete({id: this.callback_array[1]});
                 const invert: any = DateConversion.invertDate(data.value); // инвертируем дату 
-                console.log(invert)
+
                 this.collection.updateOne(
-                    {_id: this.ObjectId(invert._id)}, 
+                    {_id: this.ObjectId(this.callback_array[1])}, 
                     {$set: invert }, 
                     {upsert: true})
                         .then(() => {

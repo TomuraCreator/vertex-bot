@@ -15,7 +15,6 @@ export class Command {
     protected type: string = 'command';
     protected match_list: any; // объект для отправки запроса 
 
-
     constructor(protected bot: any, protected state: any, protected collection: any, protected chat: any) {
         if(!state && !collection) {
             throw Error('params is empty');

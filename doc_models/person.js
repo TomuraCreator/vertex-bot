@@ -30,5 +30,6 @@ module.exports = {
         "date_of_vacation": ''
     },
     "is_absent": false,
-    "date_is_absent": ''
+    "date_is_absent": '',
+    "workInTheNight": true
 }

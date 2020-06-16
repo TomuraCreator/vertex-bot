@@ -11,7 +11,7 @@ import {CallbackPositionShow as PositionShow} from '../classes/CallbackPositionS
  * Фабрика классов для обработки ответо инлайн клавиатуры
  */
 
-export class CallbackQueryFabric{
+export class CallbackQueryFabric {
 
     private arr_query: any = {
         'person': (bot: any, collection: any, state: any, chat:any) => {
@@ -42,25 +42,25 @@ export class CallbackQueryFabric{
             return new PositionShow(bot, collection, state, chat);
         }
     }
-
     constructor(protected bot: any, protected state: any, protected collection: any, protected chat: any) {
 
         this.bot = bot;
         this.collection = collection;
+        
         this.state = state;
         this.chat = chat;
         if(this.chat.data) {
             const query: Array<string> = this.chat.data.split(',');
             return this.arr_query[query[0]](
                 this.bot, 
-                this.collection, 
+                this.collection[0], 
                 this.state,
                 this.chat
                 )
         } else {
             return this.arr_query['set'](
                 this.bot, 
-                this.collection, 
+                this.collection[0], 
                 this.state,
                 this.chat
                 )
