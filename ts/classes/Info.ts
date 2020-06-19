@@ -43,7 +43,7 @@ export class Info extends Command {
              */
             const dates: any = new Date();
             const dateString: string = `${dates.getFullYear()}-${dates.getMonth()}-${dates.getDate()}`
-            let hour: number = 11
+            let hour: number = 23
             if(dates.getHours() > 8 && dates.getHours() < 20) {
                 hour = 8
             }
@@ -67,20 +67,32 @@ export class Info extends Command {
                         "фасовщик", "технолог", "уборщик", "обработчик/тары"
                     ];
 
-                    this.collection.countDocuments({"shift": String(shift), "is_absent": "нет", workInTheNight: isNight})
-                    .then( (data: any ) => { // всего присутствует 
-                        this.collection.countDocuments({"shift": String(shift), "is_absent": "да"})
-                        .then( (data_not: any ) => { // всего отсутствует
+                    this.collection.countDocuments({
+                        "shift": String(shift),
+                        "is_absent": "нет",
+                        workInTheNight: isNight
+                    }).then( (data: any ) => { // всего присутствует 
+                        this.collection.countDocuments({
+                            "shift": String(shift), 
+                            "is_absent": "да", 
+                            workInTheNight: isNight
+                        }).then( (data_not: any ) => { // всего отсутствует
                             this.sendMessage(`Всего на смене = ${data}. Отсутствует = ${data_not}`)
                         })
                     }).then(
                         () => {
                             arrayPosition.forEach((element: string) => {
                                 
-                                this.collection.countDocuments({"position": String(element), "is_absent": "нет", "shift": String(shift),})
-                                .then( (absent: any) =>  { // на смене 
-                                    this.collection.countDocuments({"position": String(element), "is_absent": "да", "shift": String(shift),})
-                                    .then( (not_absent: any) => { // отсутствуют
+                                this.collection.countDocuments({
+                                    "position": String(element),
+                                    "is_absent": "нет",
+                                    "shift": String(shift)
+                                }).then( (absent: any) =>  { // на смене 
+                                    this.collection.countDocuments({
+                                        "position": String(element),
+                                        "is_absent": "да", 
+                                        "shift": String(shift)
+                                    }).then( (not_absent: any) => { // отсутствуют
                                         const textOn: string = `На смене - ${absent}` 
                                         const textOff: string = `Отсутствует - ${not_absent}`; // построение строки клавиатуры 
                                         const markup_keyboard: any = {
@@ -129,7 +141,12 @@ export class Info extends Command {
      */
     private createMessageDate(arrayParams: any, nowDate: any) : string {
         const {shift, isNight} = arrayParams;
-        const {date, month, year, dayOfTheWeek} = nowDate; 
+
+        const date = nowDate.getDate();
+        const month = nowDate.getMonth();
+        const year = nowDate.getFullYear()
+        const dayOfTheWeek = nowDate.getDay();
+
 
         let datestr: string = `${date}`;
         let monthstr: string = '';
@@ -162,6 +179,7 @@ export class Info extends Command {
             case 10: monthstr = 'Ноября'; break;
             case 11: monthstr = 'Декабря'; break;
         }
+        console.log(nowDate)
         return `Сегодня ${weekstr}, ${date} ${monthstr} ${year}
 на работе смена №${shift} в ${workANightstr}`
     }

@@ -9,6 +9,9 @@ const TelegramBot = require('node-telegram-bot-api');
 
 const MongoClient = require("mongodb").MongoClient;
 const fs = require('fs');
+const path = require('path')
+const shift: any = require('./shift_schedule/sheduleGenerate') // генерация графика смен
+
 
 const {TOKEN, MONGODB_URI, NAME, WEBHOOK, PORT, IAM_TOKEN, FOLDER_ID} = process.env;
 
@@ -39,21 +42,6 @@ mongo.connect(function( err: string, client: any ) {
 
     // collection.updateMany({}, {$set: {workInTheNight: true}}, {multi: true}) // обновление всех документов
     
-    const shift: any = require('./shift_schedule/sheduleGenerate') // генерация графика смен
-
-    // const arraysShifts: any = shift(365, 2020, 12);
-    
-    // async function beet(element: any, i: any) {
-    //     await state_collection.insertOne(element[i])
-    // }
-    // arraysShifts.forEach((element: any) => {
-    //     for(let i = 0; i < element.length; i++) {
-
-    //         beet(element, i)
-    //     }
-    // });
-    
-
 
     const schedule = new Schedule(collection, bot);
     schedule.sheduleDateOfBirth([
@@ -96,8 +84,7 @@ mongo.connect(function( err: string, client: any ) {
     }) 
     
     
-    const fs = require('fs');
-    const path = require('path')
+
 
     const fetch = require('node-fetch');
     const api_key = IAM_TOKEN;

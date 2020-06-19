@@ -15,7 +15,7 @@ export class Add extends Command {
     private match: Array<string>;
     public constructor(bot: any, state: any, collection: any, chat:any) {
         super(bot, collection, state, chat)
-        console.log(this.chat.text)
+
         this.match = this.getArray(this.chat.text).splice(1, 10);
         this.insertToState()
     }
@@ -69,12 +69,12 @@ export class Add extends Command {
                                 callback_data: String(['yes', data.insertedId])
                             }
                         ],
-                        [
-                            {
-                                text: "изменить",
-                                callback_data: String(['change', data.insertedId]) 
-                            }
-                        ]
+                        // [
+                        //     {
+                        //         text: "изменить",
+                        //         callback_data: String(['change', data.insertedId]) 
+                        //     }
+                        // ]
                     ]
                 }
             })

@@ -46,7 +46,7 @@ function getDateString(index: number, chooseYear: number, indexMonth: number) : 
     let year: number = chooseYear,
         month: number = indexMonth,
         day: number = index,
-        time: number = 23;
+        time: number = 11;
     if(Number.isInteger(index)) { // если целое 
         time = 8
     }
