@@ -20,13 +20,13 @@ export class CallbackSetChanges extends Main {
 
     public constructor(bot: any, state: any, collection: any, chat: any) {
         super(bot, state, collection, chat)
-        const request = this.chat.text.split(' ')[0]
-        if(this.checkMessNumberInState(request)) { 
-            // проверяем есть ли в промежуточной базе такой идентификатор
-            const ErrorMessage = `Карточки с номером ${request} не существует! или запрос числа не требуется.`
-            this.sendMessage(ErrorMessage)    
-            throw new Error(ErrorMessage)
-        }
+        // const requestNumber = this.chat.text.split(' ')[0]
+        // if(this.checkMessNumberInState(requestNumber)) { 
+        //     // проверяем есть ли в промежуточной базе такой идентификатор
+        //     const ErrorMessage = `Карточки с номером ${requestNumber} не существует! или запрос числа не требуется.`
+        //     this.sendMessage(ErrorMessage)    
+        //     throw new Error(ErrorMessage)
+        // }
         this.setChanges();
     }
 
@@ -103,7 +103,7 @@ export class CallbackSetChanges extends Main {
     }
     private async checkMessNumberInState( message_number: number ) {
         const check = await this.state.findOne({message_id: Number(message_number)});
-        if(!check) {
+        if(check.hasOwnProperty("message_id")) {
             return false
         }
         return true

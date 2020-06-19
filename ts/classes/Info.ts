@@ -11,10 +11,23 @@ import { Command } from './Command'
 
 export class Info extends Command {
     readonly type: string = 'info';
+    readonly match: Array<string> = [];
     public constructor(bot: any, state: any, collection: any, chat:any) {
         super(bot, collection, state, chat)
+        this.match = this.getArray(this.chat.text);
+        const shiftPoint: number = Number(this.match[1]);
 
-        this.getInfoObject();
+        if(this.match[1]) {
+            if(Number.isNaN(shiftPoint)) {
+                throw new TypeError('параметр "смена" не является числом');
+            }
+    
+            if(shiftPoint >= 1 && shiftPoint <= 4 ) {
+
+            }
+        } else {
+            this.getInfoObject();
+        }
     }
 
     /**
@@ -25,16 +38,16 @@ export class Info extends Command {
     private getInfoObject() : void {
         try {
             /**
-             * создание объект текущей даты. Поиск в базе объекта графика по текущей дате
+             * создание объекта текущей даты. Поиск в базе объекта графика по текущей дате
              * 
              */
             const dates: any = new Date();
             const dateString: string = `${dates.getFullYear()}-${dates.getMonth()}-${dates.getDate()}`
-            let hour: number = 23
+            let hour: number = 11
             if(dates.getHours() > 8 && dates.getHours() < 20) {
                 hour = 8
             }
-
+            console.log({fullYear: dateString, timeHour: hour});
             this.state.findOne({fullYear: dateString, timeHour: hour})
             .then((data: any, err: any) => { // забираем объект текущего графика смен.
                 
@@ -43,9 +56,9 @@ export class Info extends Command {
                     message: "В базе данных нет объекта расписания с параметрами ",
                     data: {fullYear: dateString, timeHour: hour}
                 }
-                const {shift, date, month, year, dayOfTheWeek, isNight} = data;
-                console.log( data )
-                this.sendMessage(this.createMessageDate(data)); // мета сообщение с информацией по дню 
+                
+                const {shift, isNight} = data;
+                this.sendMessage(this.createMessageDate(data, dates)); // мета сообщение с информацией по дню 
                 this.collection.find().toArray((err: any, data: any)=> {
                     if(data.lenght === 0) throw Error('Was returned empty array')
 
@@ -54,19 +67,19 @@ export class Info extends Command {
                         "фасовщик", "технолог", "уборщик", "обработчик/тары"
                     ];
 
-                    this.collection.countDocuments({"shift": shift, "is_absent": "нет", workInTheNight: isNight})
+                    this.collection.countDocuments({"shift": String(shift), "is_absent": "нет", workInTheNight: isNight})
                     .then( (data: any ) => { // всего присутствует 
-                        this.collection.countDocuments({"shift": shift, "is_absent": "да"})
+                        this.collection.countDocuments({"shift": String(shift), "is_absent": "да"})
                         .then( (data_not: any ) => { // всего отсутствует
                             this.sendMessage(`Всего на смене = ${data}. Отсутствует = ${data_not}`)
                         })
                     }).then(
-                        ()=> {
+                        () => {
                             arrayPosition.forEach((element: string) => {
                                 
-                                this.collection.countDocuments({"position": String(element), "is_absent": "нет", "shift": shift,})
+                                this.collection.countDocuments({"position": String(element), "is_absent": "нет", "shift": String(shift),})
                                 .then( (absent: any) =>  { // на смене 
-                                    this.collection.countDocuments({"position": String(element), "is_absent": "да", "shift": shift,})
+                                    this.collection.countDocuments({"position": String(element), "is_absent": "да", "shift": String(shift),})
                                     .then( (not_absent: any) => { // отсутствуют
                                         const textOn: string = `На смене - ${absent}` 
                                         const textOff: string = `Отсутствует - ${not_absent}`; // построение строки клавиатуры 
@@ -75,14 +88,14 @@ export class Info extends Command {
                                             reply_markup: {
                                                 inline_keyboard: [
                                                     [
-                                                            {
-                                                                text: textOn,
-                                                                callback_data: String(['position-show', element, 'нет'])
-                                                            },
-                                                            {
-                                                                text: textOff,
-                                                                callback_data: String(['position-show', element, 'да'])
-                                                            }
+                                                        {
+                                                            text: textOn,
+                                                            callback_data: String(['position-show', element, 'нет', String(shift)])
+                                                        },
+                                                        {
+                                                            text: textOff,
+                                                            callback_data: String(['position-show', element, 'да', String(shift)])
+                                                        }
                                                     ]
                                                 ]
                                             }
@@ -114,8 +127,10 @@ export class Info extends Command {
      * формирует строку с информацией на основе объека даты из базы данных.
      * @param arrayParams 
      */
-    private createMessageDate(arrayParams: any) : string {
-        const {shift, date, month, year, dayOfTheWeek, isNight} = arrayParams; 
+    private createMessageDate(arrayParams: any, nowDate: any) : string {
+        const {shift, isNight} = arrayParams;
+        const {date, month, year, dayOfTheWeek} = nowDate; 
+
         let datestr: string = `${date}`;
         let monthstr: string = '';
         let weekstr: string = '';
@@ -132,6 +147,7 @@ export class Info extends Command {
             case 5: weekstr = 'Пятница'; break;
             case 6: weekstr = 'Суббота'; break;
         }
+
         switch (month) {
             case 0: monthstr = 'Января'; break;
             case 1: monthstr = 'Февраля'; break;
@@ -149,5 +165,4 @@ export class Info extends Command {
         return `Сегодня ${weekstr}, ${date} ${monthstr} ${year}
 на работе смена №${shift} в ${workANightstr}`
     }
-
 }

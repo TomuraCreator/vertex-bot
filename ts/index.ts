@@ -39,14 +39,21 @@ mongo.connect(function( err: string, client: any ) {
 
     // collection.updateMany({}, {$set: {workInTheNight: true}}, {multi: true}) // обновление всех документов
     
-    // const shift: any = require('./shift_schedule/sheduleGenerate') // генерация графика смен
+    const shift: any = require('./shift_schedule/sheduleGenerate') // генерация графика смен
 
-    // const arraysShifts: any = shift(365, 2020);
-    // arraysShifts.forEach((element: any, index: number, arr: any) => {
+    // const arraysShifts: any = shift(365, 2020, 12);
+    
+    // async function beet(element: any, i: any) {
+    //     await state_collection.insertOne(element[i])
+    // }
+    // arraysShifts.forEach((element: any) => {
     //     for(let i = 0; i < element.length; i++) {
-    //         state_collection.insertOne(element[i])
+
+    //         beet(element, i)
     //     }
     // });
+    
+
 
     const schedule = new Schedule(collection, bot);
     schedule.sheduleDateOfBirth([

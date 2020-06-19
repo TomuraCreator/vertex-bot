@@ -30,7 +30,8 @@ export class CallbackPositionShow extends Main {
      *  Возвращает объект поиска по должности 
      */
     private getPositionList() : any {
-        return this.collection.find({position: this.callback_array[1], is_absent: this.callback_array[2]})
+        return this.collection.find({position: this.callback_array[1],
+             is_absent: this.callback_array[2], shift: this.callback_array[3]})
     }
 
     /**
@@ -39,7 +40,7 @@ export class CallbackPositionShow extends Main {
      * @param {String} parse тип форматирования
      */
     private parseRequestPosition( array: any, parse = 'Markdown' ) : any {
-        array.sort(( a: any, b:any )=> {
+        array.sort(( a: any, b:any ) => {
             if (a.surname < b.surname) return -1
             else if (a.surname > b.surname) return 1
             else return 0

@@ -53,14 +53,14 @@ export class CallbackQueryFabric {
             const query: Array<string> = this.chat.data.split(',');
             return this.arr_query[query[0]](
                 this.bot, 
-                this.collection[0], 
+                this.collection, 
                 this.state,
                 this.chat
                 )
         } else {
             return this.arr_query['set'](
                 this.bot, 
-                this.collection[0], 
+                this.collection, 
                 this.state,
                 this.chat
                 )
